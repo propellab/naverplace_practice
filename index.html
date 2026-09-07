@@ -375,6 +375,32 @@
   .field-lg input[type=text]:focus, .field-lg textarea:focus{border-color:var(--green);}
   .field-lg input.invalid, .field-lg textarea.invalid{border-color:var(--alert)!important;background:var(--alert-tint);}
   .charset-warn{color:var(--alert);font-size:11.5px;line-height:1.6;margin-top:6px;}
+  .opt-chip-grid{display:flex;flex-wrap:wrap;gap:10px;}
+  .opt-chip{border:1.5px solid var(--line);border-radius:9px;padding:12px 16px;font-size:13.5px;
+    color:var(--gray-700);cursor:pointer;text-align:center;user-select:none;}
+  .opt-chip.sel{border-color:var(--green);color:var(--green-deep);font-weight:700;background:var(--green-tint);}
+  .toggle2-row{display:flex;gap:10px;margin-bottom:10px;}
+  .toggle2-btn{flex:1;border:1.5px solid var(--line);border-radius:9px;padding:14px;text-align:center;
+    font-size:14px;color:var(--gray-700);cursor:pointer;user-select:none;}
+  .toggle2-btn.sel{border-color:var(--green);color:var(--green-deep);font-weight:700;background:var(--green-tint);}
+  .subopt-row{display:flex;gap:10px;margin-bottom:10px;}
+  .subopt-btn{border:1.5px solid var(--line);border-radius:9px;padding:9px 16px;font-size:13px;
+    color:var(--gray-700);cursor:pointer;user-select:none;}
+  .subopt-btn.sel{border-color:var(--green);color:var(--green-deep);font-weight:700;background:var(--green-tint);}
+  .additional-note{background:var(--surface);border-radius:9px;padding:14px 16px;font-size:12.5px;
+    color:var(--gray-700);line-height:1.7;margin:12px 0;}
+  .additional-note a{color:var(--green-deep);}
+  .link-row{border:1px solid var(--line);border-radius:9px;padding:14px 16px;margin-bottom:10px;
+    display:flex;justify-content:space-between;align-items:center;}
+  .link-row .ltype{font-weight:700;font-size:13.5px;margin-bottom:3px;}
+  .link-row .lurl{font-size:12px;color:var(--gray-500);word-break:break-all;}
+  .link-row .x{cursor:pointer;color:var(--gray-500);font-weight:700;flex-shrink:0;margin-left:10px;}
+  .link-add-btn{background:var(--green-tint);color:var(--green-deep);border:none;border-radius:9px;
+    padding:13px;text-align:center;font-weight:700;font-size:13.5px;cursor:pointer;width:100%;margin-bottom:12px;}
+  .link-input-row{display:flex;gap:8px;margin-bottom:12px;}
+  .link-input-row select{width:110px;flex-shrink:0;}
+  .link-input-row input{flex:1;}
+  .link-input-row button{padding:0 18px;border-radius:9px;border:none;background:var(--green);color:#fff;font-weight:700;font-size:13px;}
   .field-lg textarea{resize:vertical;min-height:100px;line-height:1.65;}
   .field-lg{margin-bottom:16px;}
   .char-count{text-align:right;font-size:12px;color:var(--gray-500);margin-top:6px;}
@@ -723,7 +749,31 @@ let wz = {
   way:"",
   notify:null,
   reviewMode:false,
+  // 부가정보
+  facilities:[],
+  petFriendly:null, petDetail:"",
+  noKidsZone:null,
+  parkingAvail:null, parkingFee:null,
+  valetAvail:null, valetFee:null, valetPrice:"",
+  nearbyParkingAvail:null,
+  parkingDetail:"",
+  accessibility:[],
+  payment:[],
+  links:[],
 };
+let wzFormTab = 'basic';
+function wzSetFormTab(t){
+  wzFormTab = t;
+  const bTab = document.getElementById('wzTabBasic'), aTab = document.getElementById('wzTabAdditional');
+  if(bTab) bTab.classList.toggle('active', t==='basic');
+  if(aTab) aTab.classList.toggle('active', t==='additional');
+  wzRenderForm(); wzRenderPreview();
+}
+
+const FACILITY_OPTS = ["단체 이용 가능","포장","배달","방문접수/출장","예약","무선 인터넷","유아시설 (놀이방)","남/녀 화장실 구분","유아의자","대기공간"];
+const ACCESS_OPTS = ["휠체어 이용가능 출입구","휠체어 이용가능 화장실","휠체어 이용가능 좌석","장애인 주차구역"];
+const PAYMENT_OPTS = ["지역화폐 (지류형)","지역화폐 (카드형)","지역화폐 (모바일형)","제로페이","간편결제"];
+const LINK_TYPES = ["일반","블로그","인스타그램","페이스북","유튜브","기타"];
 
 function viewWizardShell(){
   return `
@@ -732,10 +782,10 @@ function viewWizardShell(){
     ${sidebarNav(0)}
     <div class="biz-main">
       <div class="form-tabs">
-        <div class="form-tab active">기본정보</div>
-        <div class="form-tab">부가정보</div>
-        <div class="form-tab">가격정보</div>
-        <div class="form-tab">휴무일·영업시간</div>
+        <div class="form-tab ${wzFormTab==='basic'?'active':''}" id="wzTabBasic" onclick="wzSetFormTab('basic')">기본정보</div>
+        <div class="form-tab ${wzFormTab==='additional'?'active':''}" id="wzTabAdditional" onclick="wzSetFormTab('additional')">부가정보</div>
+        <div class="form-tab" onclick="alert('실습에서는 지원하지 않아요')">가격정보</div>
+        <div class="form-tab" onclick="alert('실습에서는 지원하지 않아요')">휴무일·영업시간</div>
       </div>
       <div class="ad-banner">
         <div class="thumb"></div>
@@ -762,6 +812,7 @@ function viewWizardShell(){
 function initWizard(){
   if(!wz.name){ wz.name = userName; }
   wz.reviewMode = false;
+  wzFormTab = 'basic';
   wzRenderForm();
   wzRenderPreview();
 }
@@ -770,6 +821,7 @@ function initWizard(){
 function wzRenderForm(){
   const area = document.getElementById('wzFormArea');
   if(wz.reviewMode){ area.innerHTML = wzRenderReview(); return; }
+  if(wzFormTab==='additional'){ area.innerHTML = wzRenderAdditionalForm(); wzRenderLinkList(); return; }
 
   area.innerHTML = `
   <div class="form-scroll">
@@ -950,6 +1002,160 @@ function wzRenderForm(){
   wzRenderKeywordChips();
   wzRenderMenuList();
   wzUpdateFeedback();
+}
+
+/* ---------------- ADDITIONAL INFO FORM (부가정보) ---------------- */
+function chipGroup(options, selectedArr, toggleFnName){
+  return `<div class="opt-chip-grid">${options.map(o=>`
+    <div class="opt-chip ${selectedArr.includes(o)?'sel':''}" onclick="${toggleFnName}('${o.replace(/'/g,"\\'")}')">${o}</div>
+  `).join("")}</div>`;
+}
+function toggle2(curVal, valA, labelA, valB, labelB, fnName){
+  return `<div class="toggle2-row">
+    <div class="toggle2-btn ${curVal===valA?'sel':''}" onclick="${fnName}('${valA}')">${labelA}</div>
+    <div class="toggle2-btn ${curVal===valB?'sel':''}" onclick="${fnName}('${valB}')">${labelB}</div>
+  </div>`;
+}
+
+function wzRenderAdditionalForm(){
+  return `
+  <div class="form-scroll">
+    <div class="sect">
+      <div class="field-lg">
+        <label style="font-size:19px;">고객들이 우리 가게를 잘 이해할 수 있도록 부가 정보를 상세하게 알려주세요.</label>
+        <div class="wz-hint" style="margin:8px 0 0;">💡 <span>중복 선택 가능합니다.</span></div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>제공하는 시설을 모두 선택해 주세요.</label>
+        ${chipGroup(FACILITY_OPTS, wz.facilities, 'wzToggleFacility')}
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>반려동물 동반이 가능한가요?</label>
+        ${toggle2(wz.petFriendly, 'yes','동반 가능', 'no','불가', 'wzSetPetFriendly')}
+        ${wz.petFriendly==='yes' ? `
+        <label style="margin-top:14px;">상세 설명 (선택)</label>
+        <textarea id="wz-pet-detail" maxlength="200" oninput="wzOnPetDetail(this.value); wzCharsetGuard(this)" placeholder="소형견만 입장 가능, 리드줄 필수 등 상세 내용을 입력해주세요.">${escapeHtml(wz.petDetail)}</textarea>
+        <div class="char-count"><span>${wz.petDetail.length}</span>/200자</div>
+        ` : ``}
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>노키즈존을 운영하고 계신가요?</label>
+        ${toggle2(wz.noKidsZone, 'yes','노키즈존 운영', 'none','해당없음', 'wzSetNoKids')}
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>주차가 가능한가요?</label>
+        ${toggle2(wz.parkingAvail, 'yes','가능', 'no','불가', 'wzSetParkingAvail')}
+        ${wz.parkingAvail==='yes' ? `
+        <div class="subopt-row">
+          <div class="subopt-btn ${wz.parkingFee==='paid'?'sel':''}" onclick="wzSetParkingFee('paid')">유료</div>
+          <div class="subopt-btn ${wz.parkingFee==='free'?'sel':''}" onclick="wzSetParkingFee('free')">무료</div>
+        </div>` : ``}
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>발렛파킹이 가능한가요?</label>
+        ${toggle2(wz.valetAvail, 'yes','가능', 'no','불가', 'wzSetValetAvail')}
+        ${wz.valetAvail==='yes' ? `
+        <div class="subopt-row">
+          <div class="subopt-btn ${wz.valetFee==='paid'?'sel':''}" onclick="wzSetValetFee('paid')">유료</div>
+          <div class="subopt-btn ${wz.valetFee==='free'?'sel':''}" onclick="wzSetValetFee('free')">무료</div>
+        </div>
+        ${wz.valetFee==='paid' ? `<input type="text" id="wz-valet-price" value="${escapeHtml(wz.valetPrice)}" oninput="wzOnValetPrice(this.value)" placeholder="예: 5,000 원"/>` : ``}
+        ` : ``}
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>인근 대체 주차장 이용이 가능한가요?</label>
+        ${toggle2(wz.nearbyParkingAvail, 'yes','가능', 'no','불가', 'wzSetNearbyParking')}
+        <div class="additional-note">주차장 추가 후, 주차 상세 제공 혜택은 아래 상세 안내 정보로 입력해 주세요.<br/>주차 불가 업체의 등록된 인근 주차장은 네이버지도 내비게이션에서 지정주차장으로 안내됩니다.</div>
+        <label>주차 위치 등 상세 안내</label>
+        <textarea id="wz-parking-detail" maxlength="400" oninput="wzOnParkingDetail(this.value); wzCharsetGuard(this)" placeholder="예: 청담동 47-1 건물에 발렛 부스가 있습니다.">${escapeHtml(wz.parkingDetail)}</textarea>
+        <div class="char-count"><span>${wz.parkingDetail.length}</span>/400자</div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>장애인 편의시설이 있나요?</label>
+        ${chipGroup(ACCESS_OPTS, wz.accessibility, 'wzToggleAccess')}
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>이용가능한 결제수단을 선택해주세요.</label>
+        ${chipGroup(PAYMENT_OPTS, wz.payment, 'wzTogglePayment')}
+        <div class="additional-note">네이버페이, 카카오페이, 페이코, 애플페이 등 QR코드결제 또는 바코드결제가 가능한 경우 간편결제를 선택해 주세요.<br/>제로페이 정보는 가맹점 데이터 연동을 통해서도 제공되고 있습니다.</div>
+      </div>
+    </div>
+
+    <div class="sect" style="border-bottom:none;">
+      <div class="field-lg">
+        <label>운영중인 홈페이지, SNS, 커뮤니티 등이 있나요?</label>
+        <div class="link-input-row">
+          <select id="wz-link-type">${LINK_TYPES.map(t=>`<option>${t}</option>`).join("")}</select>
+          <input type="text" id="wz-link-url" placeholder="URL 입력 (예: https://...)" oninput="wzCharsetGuard(this)"/>
+          <button onclick="wzAddLink()">추가</button>
+        </div>
+        <div id="wzLinkList"></div>
+      </div>
+    </div>
+
+    <div class="save-btn-wrap">
+      <button class="save-btn" onclick="wzSave()">저장하기</button>
+      <div style="margin-top:14px;"><span class="wz-back" style="display:inline-flex;" onclick="goto('bizdetail')">← 업체 관리로 돌아가기</span></div>
+    </div>
+  </div>`;
+}
+
+function wzToggleFacility(v){ const i=wz.facilities.indexOf(v); if(i>-1) wz.facilities.splice(i,1); else wz.facilities.push(v); wzRenderForm(); wzRenderPreview(); }
+function wzSetPetFriendly(v){ wz.petFriendly = wz.petFriendly===v ? null : v; wzRenderForm(); wzRenderPreview(); }
+function wzOnPetDetail(v){ wz.petDetail = v.slice(0,200); wzRenderPreview(); }
+function wzSetNoKids(v){ wz.noKidsZone = wz.noKidsZone===v ? null : v; wzRenderForm(); wzRenderPreview(); }
+function wzSetParkingAvail(v){ wz.parkingAvail = wz.parkingAvail===v ? null : v; if(wz.parkingAvail!=='yes') wz.parkingFee=null; wzRenderForm(); wzRenderPreview(); }
+function wzSetParkingFee(v){ wz.parkingFee = wz.parkingFee===v ? null : v; wzRenderForm(); wzRenderPreview(); }
+function wzSetValetAvail(v){ wz.valetAvail = wz.valetAvail===v ? null : v; if(wz.valetAvail!=='yes'){ wz.valetFee=null; wz.valetPrice=""; } wzRenderForm(); wzRenderPreview(); }
+function wzSetValetFee(v){ wz.valetFee = wz.valetFee===v ? null : v; if(wz.valetFee!=='paid') wz.valetPrice=""; wzRenderForm(); wzRenderPreview(); }
+function wzOnValetPrice(v){ wz.valetPrice=v; wzRenderPreview(); }
+function wzSetNearbyParking(v){ wz.nearbyParkingAvail = wz.nearbyParkingAvail===v ? null : v; wzRenderForm(); wzRenderPreview(); }
+function wzOnParkingDetail(v){ wz.parkingDetail = v.slice(0,400); wzRenderPreview(); }
+function wzToggleAccess(v){ const i=wz.accessibility.indexOf(v); if(i>-1) wz.accessibility.splice(i,1); else wz.accessibility.push(v); wzRenderForm(); wzRenderPreview(); }
+function wzTogglePayment(v){ const i=wz.payment.indexOf(v); if(i>-1) wz.payment.splice(i,1); else wz.payment.push(v); wzRenderForm(); wzRenderPreview(); }
+
+function wzAddLink(){
+  const typeEl = document.getElementById('wz-link-type');
+  const urlEl = document.getElementById('wz-link-url');
+  const url = urlEl.value.trim();
+  if(!url) return;
+  wz.links.push({type:typeEl.value, url});
+  urlEl.value = "";
+  wzRenderLinkList();
+  wzRenderPreview();
+}
+function wzRemoveLink(i){ wz.links.splice(i,1); wzRenderLinkList(); wzRenderPreview(); }
+function wzRenderLinkList(){
+  const box = document.getElementById('wzLinkList'); if(!box) return;
+  box.innerHTML = wz.links.map((l,i)=>`
+    <div class="link-row">
+      <div><div class="ltype">${escapeHtml(l.type)}</div><div class="lurl">${escapeHtml(l.url)}</div></div>
+      <span class="x" onclick="wzRemoveLink(${i})">✕</span>
+    </div>`).join("");
 }
 
 /* ---------------- REVIEW ---------------- */
@@ -1153,6 +1359,23 @@ function wzRenderPreview(){
   const hasPhone = wz.phoneNum.length > 0;
   const photoCount = wz.photos.length;
 
+  // website / SNS links
+  const mainLink = wz.links.find(l=>l.type==='일반') || wz.links[0];
+  const otherLinks = wz.links.filter(l=>l!==mainLink);
+  const websiteHtml = mainLink
+    ? `<div class="maintext" style="color:#3B82F6;font-weight:400;font-size:12.5px;">${escapeHtml(mainLink.url)}</div>${otherLinks.length ? `<div class="links">${otherLinks.map(l=>escapeHtml(l.type)).join(' · ')}</div>` : ``}`
+    : `<span class="ph-empty">정보 없음</span>`;
+
+  // amenities tag aggregation
+  const amenityTags = [...wz.facilities];
+  if(wz.parkingAvail==='yes') amenityTags.push('주차');
+  if(wz.valetAvail==='yes') amenityTags.push('발렛파킹');
+  if(wz.petFriendly==='yes') amenityTags.push('반려동물 동반');
+  if(wz.accessibility.length) amenityTags.push(...wz.accessibility);
+  const amenityHtml = amenityTags.length
+    ? amenityTags.map(t=>`<span class="ph-tag">${escapeHtml(t)}</span>`).join("")
+    : `<span class="ph-empty">정보 없음</span>`;
+
   const carouselSlides = photoCount
     ? wz.photos.slice(0,4).map(p=>`<div class="slide"><img src="${p}"/></div>`).join("")
     : `<div class="slide">대표사진</div><div class="slide">사진을 등록해보세요</div>`;
@@ -1194,11 +1417,11 @@ function wzRenderPreview(){
       </div>
       <div class="ph-row">
         <div class="ic">🌐</div>
-        <div class="body"><span class="ph-empty">정보 없음</span></div>
+        <div class="body">${websiteHtml}</div>
       </div>
       <div class="ph-row" style="border-bottom:none;">
         <div class="ic">🏬</div>
-        <div class="body"><span class="ph-empty">정보 없음</span></div>
+        <div class="body">${amenityHtml}</div>
       </div>`;
   }
   else if(wzPreviewTab==='news'){
@@ -1243,7 +1466,15 @@ function wzRenderPreview(){
       <div class="ph-info-section"><h5>찾아오는 길</h5><div class="val">${wayHtml}</div></div>
       <div class="ph-info-section"><h5>소개</h5><div class="val ph-intro-preview">${introHtml}</div></div>
       ${wz.keywords.length ? `<div class="ph-info-section"><h5>대표키워드</h5><div class="val">${wz.keywords.map(k=>`<span class="ph-tag">${escapeHtml(k)}</span>`).join("")}</div></div>` : ``}
-      <div class="ph-info-section" style="border-bottom:none;"><h5>메뉴/가격표</h5><div class="val">${wz.menuItems.length ? wz.menuItems.map(m=>`<div class="ph-price-row"><span>${escapeHtml(m.name)}</span><span class="amt">${m.price?escapeHtml(m.price):'변동'}</span></div>`).join("") : ``}</div></div>`;
+      <div class="ph-info-section"><h5>메뉴/가격표</h5><div class="val">${wz.menuItems.length ? wz.menuItems.map(m=>`<div class="ph-price-row"><span>${escapeHtml(m.name)}</span><span class="amt">${m.price?escapeHtml(m.price):'변동'}</span></div>`).join("") : ``}</div></div>
+      <div class="ph-info-section"><h5>제공 시설</h5><div class="val">${amenityHtml}</div></div>
+      <div class="ph-info-section"><h5>반려동물 동반</h5><div class="val">${wz.petFriendly==='yes' ? `가능${wz.petDetail ? ' · '+escapeHtml(wz.petDetail) : ''}` : wz.petFriendly==='no' ? '불가' : `<span class="ph-empty">정보 없음</span>`}</div></div>
+      <div class="ph-info-section"><h5>노키즈존</h5><div class="val">${wz.noKidsZone==='yes' ? '운영' : wz.noKidsZone==='none' ? '해당없음' : `<span class="ph-empty">정보 없음</span>`}</div></div>
+      <div class="ph-info-section"><h5>주차</h5><div class="val">${wz.parkingAvail==='yes' ? `가능${wz.parkingFee?' · '+(wz.parkingFee==='paid'?'유료':'무료'):''}` : wz.parkingAvail==='no' ? '불가' : `<span class="ph-empty">정보 없음</span>`}</div></div>
+      <div class="ph-info-section"><h5>발렛파킹</h5><div class="val">${wz.valetAvail==='yes' ? `가능${wz.valetFee?' · '+(wz.valetFee==='paid'?('유료'+(wz.valetPrice?' '+escapeHtml(wz.valetPrice):'')):'무료'):''}` : wz.valetAvail==='no' ? '불가' : `<span class="ph-empty">정보 없음</span>`}</div></div>
+      ${wz.parkingDetail ? `<div class="ph-info-section"><h5>주차 상세 안내</h5><div class="val">${escapeHtml(wz.parkingDetail)}</div></div>` : ``}
+      <div class="ph-info-section"><h5>결제수단</h5><div class="val">${wz.payment.length ? wz.payment.map(p=>`<span class="ph-tag">${escapeHtml(p)}</span>`).join("") : `<span class="ph-empty">정보 없음</span>`}</div></div>
+      <div class="ph-info-section" style="border-bottom:none;"><h5>홈페이지/SNS</h5><div class="val">${wz.links.length ? wz.links.map(l=>`<div style="margin-bottom:4px;">${escapeHtml(l.type)} · ${escapeHtml(l.url)}</div>`).join("") : `<span class="ph-empty">정보 없음</span>`}</div></div>`;
   }
 
   screen.innerHTML = `
