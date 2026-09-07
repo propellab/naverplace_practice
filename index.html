@@ -904,19 +904,6 @@ function wzRenderForm(){
 
     <div class="sect">
       <div class="field-lg">
-        <label>메뉴/가격표</label>
-        <div class="wz-hint" style="margin:0 0 10px;">💡 <span>메뉴 또는 서비스명과 가격을 입력해주세요. 가격을 비워두면 손님에게 "변동"으로 표시됩니다.</span></div>
-        <div class="menu-input-row">
-          <input type="text" id="wz-menu-name" placeholder="메뉴명 (예: 1:1 클래식 필라테스)" oninput="wzCharsetGuard(this)" onkeydown="if(event.key==='Enter')wzAddMenuItem()"/>
-          <input type="text" id="wz-menu-price" placeholder="가격 (선택)" oninput="wzCharsetGuard(this)" onkeydown="if(event.key==='Enter')wzAddMenuItem()"/>
-          <button onclick="wzAddMenuItem()">추가</button>
-        </div>
-        <div id="wzMenuList"></div>
-      </div>
-    </div>
-
-    <div class="sect">
-      <div class="field-lg">
         <label>전화번호를 입력해주세요.<span class="req">필수</span></label>
         <div class="phone-row">
           <select id="wz-phone-code" onchange="wzOnPhoneCode(this.value)">
@@ -1000,7 +987,6 @@ function wzRenderForm(){
 
   wzRenderPhotoGrid();
   wzRenderKeywordChips();
-  wzRenderMenuList();
   wzUpdateFeedback();
 }
 
