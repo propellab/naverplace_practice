@@ -401,6 +401,31 @@
   .link-input-row select{width:110px;flex-shrink:0;}
   .link-input-row input{flex:1;}
   .link-input-row button{padding:0 18px;border-radius:9px;border:none;background:var(--green);color:#fff;font-weight:700;font-size:13px;}
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+  .modal-card{background:#fff;border-radius:14px;padding:32px;width:440px;max-width:100%;max-height:85vh;overflow-y:auto;}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;font-size:19px;font-weight:800;color:var(--ink);}
+  .modal-head .req{color:var(--green-deep);font-size:12px;font-weight:700;}
+  .modal-field{margin-bottom:22px;}
+  .modal-field > label{display:flex;justify-content:space-between;align-items:center;font-size:14.5px;font-weight:700;margin-bottom:10px;color:var(--ink);}
+  .modal-field .req-mark{color:var(--alert);}
+  .modal-field .chk-row{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;color:var(--gray-700);cursor:pointer;}
+  .modal-field input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:13px 14px;font-size:14.5px;}
+  .modal-price-row{position:relative;}
+  .modal-price-row input{padding-right:36px;}
+  .modal-price-row .won{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--gray-500);font-size:13px;}
+  .modal-btns{display:flex;gap:10px;margin-top:8px;}
+  .modal-btns button{flex:1;padding:14px;border-radius:9px;font-size:14.5px;font-weight:700;border:none;cursor:pointer;}
+  .modal-btns .cancel{background:var(--surface);color:var(--gray-700);}
+  .modal-btns .confirm{background:var(--green);color:#fff;}
+  .price-list-item{padding:14px 2px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;}
+  .price-list-item:last-child{border-bottom:none;}
+  .price-list-item .pname{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+  .price-list-item .pprice{font-size:13px;color:var(--alert);font-weight:700;}
+  .price-list-item .pprice.set{color:var(--gray-700);}
+  .price-list-item .x{cursor:pointer;color:var(--gray-500);font-weight:700;flex-shrink:0;margin-left:10px;}
+  .price-add-btn{background:var(--green-tint);color:var(--green-deep);border:none;border-radius:9px;padding:14px;font-weight:700;font-size:13.5px;cursor:pointer;flex:1;}
+  .price-order-btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:14px 18px;font-size:13px;color:var(--gray-700);cursor:pointer;}
+  .price-btn-row{display:flex;gap:10px;margin-bottom:16px;}
   .field-lg textarea{resize:vertical;min-height:100px;line-height:1.65;}
   .field-lg{margin-bottom:16px;}
   .char-count{text-align:right;font-size:12px;color:var(--gray-500);margin-top:6px;}
@@ -760,13 +785,19 @@ let wz = {
   accessibility:[],
   payment:[],
   links:[],
+  // 가격정보
+  priceImages:[],
+  priceModalOpen:false,
+  priceModalVariable:false,
+  priceModalName:"",
 };
 let wzFormTab = 'basic';
 function wzSetFormTab(t){
   wzFormTab = t;
-  const bTab = document.getElementById('wzTabBasic'), aTab = document.getElementById('wzTabAdditional');
+  const bTab = document.getElementById('wzTabBasic'), aTab = document.getElementById('wzTabAdditional'), pTab = document.getElementById('wzTabPrice');
   if(bTab) bTab.classList.toggle('active', t==='basic');
   if(aTab) aTab.classList.toggle('active', t==='additional');
+  if(pTab) pTab.classList.toggle('active', t==='price');
   wzRenderForm(); wzRenderPreview();
 }
 
@@ -774,6 +805,7 @@ const FACILITY_OPTS = ["단체 이용 가능","포장","배달","방문접수/�
 const ACCESS_OPTS = ["휠체어 이용가능 출입구","휠체어 이용가능 화장실","휠체어 이용가능 좌석","장애인 주차구역"];
 const PAYMENT_OPTS = ["지역화폐 (지류형)","지역화폐 (카드형)","지역화폐 (모바일형)","제로페이","간편결제"];
 const LINK_TYPES = ["일반","블로그","인스타그램","페이스북","유튜브","기타"];
+function formatWon(v){ if(!v) return ''; const n = parseInt(String(v).replace(/[^0-9]/g,''),10); if(isNaN(n)) return v; return n.toLocaleString('ko-KR')+'원'; }
 
 function viewWizardShell(){
   return `
@@ -784,7 +816,7 @@ function viewWizardShell(){
       <div class="form-tabs">
         <div class="form-tab ${wzFormTab==='basic'?'active':''}" id="wzTabBasic" onclick="wzSetFormTab('basic')">기본정보</div>
         <div class="form-tab ${wzFormTab==='additional'?'active':''}" id="wzTabAdditional" onclick="wzSetFormTab('additional')">부가정보</div>
-        <div class="form-tab" onclick="alert('실습에서는 지원하지 않아요')">가격정보</div>
+        <div class="form-tab ${wzFormTab==='price'?'active':''}" id="wzTabPrice" onclick="wzSetFormTab('price')">가격정보</div>
         <div class="form-tab" onclick="alert('실습에서는 지원하지 않아요')">휴무일·영업시간</div>
       </div>
       <div class="ad-banner">
@@ -822,6 +854,7 @@ function wzRenderForm(){
   const area = document.getElementById('wzFormArea');
   if(wz.reviewMode){ area.innerHTML = wzRenderReview(); return; }
   if(wzFormTab==='additional'){ area.innerHTML = wzRenderAdditionalForm(); wzRenderLinkList(); return; }
+  if(wzFormTab==='price'){ area.innerHTML = wzRenderPriceForm(); wzRenderPriceImageGrid(); wzRenderMenuList(); return; }
 
   area.innerHTML = `
   <div class="form-scroll">
@@ -1264,30 +1297,134 @@ function wzRenderKeywordChips(){
   if(addBtn) addBtn.classList.toggle('active', wz.keywords.length<5);
 }
 
-/* ---------------- MENU / PRICE LIST ---------------- */
-function wzAddMenuItem(){
-  const nameEl = document.getElementById('wz-menu-name');
-  const priceEl = document.getElementById('wz-menu-price');
+/* ---------------- PRICE INFO (가격정보) ---------------- */
+function wzRenderPriceForm(){
+  return `
+  <div class="form-scroll">
+    <div class="sect">
+      <div class="field-lg">
+        <label style="font-size:19px;">우리 가게의 가격 정보를 입력해 주세요.</label>
+        <div class="wz-hint" style="margin:8px 0 0;">💡 <span>등록 후 언제든지 추가, 수정이 가능합니다</span></div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>가격표 사진을 추가해주세요.</label>
+        <div class="photo-grid-lg" id="wzPriceImgGrid"></div>
+        <div class="photo-note">1장당 20MB 이하, 최대 10장</div>
+      </div>
+    </div>
+
+    <div class="sect" style="border-bottom:none;">
+      <div class="field-lg">
+        <label>가격정보를 추가해 주세요.</label>
+        <div class="wz-hint" style="margin:8px 0 14px;">💡 <span>최대 200개까지 등록 가능합니다. 가격 관련 사진은 위 업체사진으로 등록해 주세요.</span></div>
+        <div class="price-btn-row">
+          <button class="price-add-btn" onclick="wzOpenPriceModal()">+ 가격 추가 (${wz.menuItems.length}/200)</button>
+          <button class="price-order-btn" onclick="alert('실습에서는 지원하지 않아요')">순서/삭제</button>
+        </div>
+        <div id="wzMenuList"></div>
+      </div>
+    </div>
+
+    <div class="save-btn-wrap">
+      <button class="save-btn" onclick="wzSave()">저장하기</button>
+      <div style="margin-top:14px;"><span class="wz-back" style="display:inline-flex;" onclick="goto('bizdetail')">← 업체 관리로 돌아가기</span></div>
+    </div>
+  </div>
+  ${wz.priceModalOpen ? wzRenderPriceModal() : ``}`;
+}
+
+function wzRenderPriceModal(){
+  return `
+  <div class="modal-backdrop" onclick="wzClosePriceModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-head"><span>가격정보 추가하기</span><span class="req">*필수</span></div>
+      <div class="modal-field">
+        <label>상품명 <span class="req-mark">*</span></label>
+        <input type="text" id="wz-modal-name" maxlength="20" value="${escapeHtml(wz.priceModalName)}" placeholder="상품명을 입력해 주세요." oninput="wzOnModalNameInput(this.value)"/>
+        <div class="char-count"><span id="wzModalNameCount">${wz.priceModalName.length}</span>/20자</div>
+      </div>
+      <div class="modal-field">
+        <label>가격 <span class="req-mark">*</span>
+          <span class="chk-row" onclick="wzToggleModalVariable()">
+            <input type="checkbox" ${wz.priceModalVariable?'checked':''} readonly/> 변동가격
+          </span>
+        </label>
+        ${!wz.priceModalVariable ? `
+        <div class="modal-price-row">
+          <input type="text" id="wz-modal-price" placeholder="가격을 입력해 주세요." oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
+          <span class="won">원</span>
+        </div>` : ``}
+      </div>
+      <div class="modal-btns">
+        <button class="cancel" onclick="wzClosePriceModal()">취소</button>
+        <button class="confirm" onclick="wzSubmitPriceModal()">추가하기</button>
+      </div>
+    </div>
+  </div>`;
+}
+function wzOnModalNameInput(v){ wz.priceModalName = v; const c=document.getElementById('wzModalNameCount'); if(c) c.textContent=v.length; }
+function wzOpenPriceModal(){ wz.priceModalOpen=true; wz.priceModalVariable=false; wz.priceModalName=""; wzRenderForm(); setTimeout(()=>{ const el=document.getElementById('wz-modal-name'); if(el) el.focus(); },0); }
+function wzClosePriceModal(){ wz.priceModalOpen=false; wzRenderForm(); }
+function wzToggleModalVariable(){ wz.priceModalVariable = !wz.priceModalVariable; wzRenderForm(); }
+function wzSubmitPriceModal(){
+  const nameEl = document.getElementById('wz-modal-name');
   const name = nameEl.value.trim();
-  if(!name) return;
-  const price = priceEl.value.trim();
+  if(!name){ nameEl.focus(); return; }
+  let price = "";
+  if(!wz.priceModalVariable){
+    const priceEl = document.getElementById('wz-modal-price');
+    price = priceEl.value.trim();
+    if(!price){ priceEl.focus(); return; }
+  }
   wz.menuItems.push({name, price});
-  nameEl.value = ""; priceEl.value = "";
-  wzRenderMenuList();
+  wz.priceModalOpen = false;
+  wz.priceModalName = "";
+  wzRenderForm();
   wzRenderPreview();
-  nameEl.focus();
 }
 function wzRemoveMenuItem(i){ wz.menuItems.splice(i,1); wzRenderMenuList(); wzRenderPreview(); }
 function wzRenderMenuList(){
   const box = document.getElementById('wzMenuList'); if(!box) return;
+  if(!wz.menuItems.length){ box.innerHTML = `<div class="ph-empty" style="padding:14px 2px;">아직 등록된 가격정보가 없습니다.</div>`; return; }
   box.innerHTML = wz.menuItems.map((m,i)=>`
-    <div class="menu-row">
-      <span>${escapeHtml(m.name)}</span>
-      <span style="display:flex;align-items:center;">
-        <span class="mprice">${m.price ? escapeHtml(m.price) : '변동'}</span>
-        <span class="x" onclick="wzRemoveMenuItem(${i})">✕</span>
-      </span>
+    <div class="price-list-item">
+      <div>
+        <div class="pname">${escapeHtml(m.name)}</div>
+        <div class="pprice ${m.price?'set':''}">${m.price ? formatWon(m.price) : '변동가격'}</div>
+      </div>
+      <span class="x" onclick="wzRemoveMenuItem(${i})">✕</span>
     </div>`).join("");
+}
+function wzRenderPriceImageGrid(){
+  const grid = document.getElementById('wzPriceImgGrid'); if(!grid) return;
+  grid.innerHTML = "";
+  const addCell = document.createElement('div');
+  addCell.className = 'photo-slot-lg';
+  addCell.innerHTML = `<div>＋</div><div>사진추가<br/>드래그 가능</div>`;
+  addCell.onclick = wzPickPriceImage;
+  grid.appendChild(addCell);
+  wz.priceImages.forEach((p,i)=>{
+    const cell = document.createElement('div');
+    cell.className = 'photo-slot-lg';
+    cell.innerHTML = `<img src="${p}"/><div class="num" style="position:absolute;top:5px;right:5px;background:rgba(255,255,255,.85);border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;">✕</div>`;
+    cell.querySelector('.num').onclick = (e)=>{ e.stopPropagation(); wz.priceImages.splice(i,1); wzRenderPriceImageGrid(); };
+    grid.appendChild(cell);
+  });
+}
+function wzPickPriceImage(){
+  if(wz.priceImages.length>=10) return;
+  const input = document.createElement('input');
+  input.type='file'; input.accept='image/*';
+  input.onchange = (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{ wz.priceImages.push(ev.target.result); wzRenderPriceImageGrid(); };
+    reader.readAsDataURL(file);
+  };
+  input.click();
 }
 
 /* ---------------- PHOTOS ---------------- */
@@ -1399,7 +1536,7 @@ function wzRenderPreview(){
       </div>
       <div class="ph-row">
         <div class="ic">₩</div>
-        <div class="body">${wz.menuItems.length ? wz.menuItems.map(m=>`<div class="ph-price-row"><span>${escapeHtml(m.name)}</span><span class="amt">${m.price?escapeHtml(m.price):'변동'}</span></div>`).join("") : ``}</div>
+        <div class="body">${wz.menuItems.length ? wz.menuItems.map(m=>`<div class="ph-price-row"><span>${escapeHtml(m.name)}</span><span class="amt">${m.price?formatWon(m.price):'변동'}</span></div>`).join("") : ``}</div>
       </div>
       <div class="ph-row">
         <div class="ic">🌐</div>
@@ -1452,7 +1589,7 @@ function wzRenderPreview(){
       <div class="ph-info-section"><h5>찾아오는 길</h5><div class="val">${wayHtml}</div></div>
       <div class="ph-info-section"><h5>소개</h5><div class="val ph-intro-preview">${introHtml}</div></div>
       ${wz.keywords.length ? `<div class="ph-info-section"><h5>대표키워드</h5><div class="val">${wz.keywords.map(k=>`<span class="ph-tag">${escapeHtml(k)}</span>`).join("")}</div></div>` : ``}
-      <div class="ph-info-section"><h5>메뉴/가격표</h5><div class="val">${wz.menuItems.length ? wz.menuItems.map(m=>`<div class="ph-price-row"><span>${escapeHtml(m.name)}</span><span class="amt">${m.price?escapeHtml(m.price):'변동'}</span></div>`).join("") : ``}</div></div>
+      <div class="ph-info-section"><h5>메뉴/가격표</h5><div class="val">${wz.menuItems.length ? wz.menuItems.map(m=>`<div class="ph-price-row"><span>${escapeHtml(m.name)}</span><span class="amt">${m.price?formatWon(m.price):'변동'}</span></div>`).join("") : ``}</div></div>
       <div class="ph-info-section"><h5>제공 시설</h5><div class="val">${amenityHtml}</div></div>
       <div class="ph-info-section"><h5>반려동물 동반</h5><div class="val">${wz.petFriendly==='yes' ? `가능${wz.petDetail ? ' · '+escapeHtml(wz.petDetail) : ''}` : wz.petFriendly==='no' ? '불가' : `<span class="ph-empty">정보 없음</span>`}</div></div>
       <div class="ph-info-section"><h5>노키즈존</h5><div class="val">${wz.noKidsZone==='yes' ? '운영' : wz.noKidsZone==='none' ? '해당없음' : `<span class="ph-empty">정보 없음</span>`}</div></div>
