@@ -1447,14 +1447,14 @@ function wzRenderHoursForm(){
     <div class="collapse-row" onclick="alert('실습에서는 지원하지 않아요')">
       <span class="lbl">평상시와 다르게 영업시간을 운영하는 날짜가 있다면?</span><span class="act">설정하기 ⌄</span>
     </div>
-    <div class="collapse-row" onclick="wzToggleHoursNote()" style="${wz.hoursNoteOpen?'border-bottom:none;':''}">
-      <span class="lbl">영업시간이나 휴무일 관련 추가 안내</span><span class="act">${wz.hoursNoteOpen?'접기 ▲':'입력하기 ⌄'}</span>
-    </div>
-    ${wz.hoursNoteOpen ? `
+
     <div class="sect" style="border-bottom:none;">
-      <textarea id="wz-hours-note" maxlength="300" oninput="wzOnHoursNote(this.value); wzCharsetGuard(this)" placeholder="예: 명절 연휴 기간에는 일부 프로그램 운영이 제한될 수 있습니다.">${escapeHtml(wz.hoursNote)}</textarea>
-      <div class="char-count"><span>${wz.hoursNote.length}</span>/300자</div>
-    </div>` : ``}
+      <div class="field-lg">
+        <label>영업시간이나 휴무일 관련 추가 안내</label>
+        <input type="text" id="wz-hours-note" maxlength="30" value="${escapeHtml(wz.hoursNote)}" oninput="wzOnHoursNote(this.value); wzCharsetGuard(this)" placeholder="안내사항을 입력해 주세요."/>
+        <div class="char-count"><span id="wzHoursNoteCount">${wz.hoursNote.length}</span>/30자</div>
+      </div>
+    </div>
 
     <div class="save-btn-wrap">
       <button class="save-btn" onclick="wzSave()">저장하기</button>
@@ -1486,8 +1486,7 @@ function wzRenderExtraDateChips(){
   box.innerHTML = wz.extraClosedDates.map((d,i)=>`<div class="date-chip">${escapeHtml(d)}<span class="x" onclick="wzRemoveExtraDate(${i})">✕</span></div>`).join("");
 }
 function wzSetHoursMode(m){ wz.hoursMode = m; wzRenderForm(); wzRenderPreview(); }
-function wzToggleHoursNote(){ wz.hoursNoteOpen = !wz.hoursNoteOpen; wzRenderForm(); }
-function wzOnHoursNote(v){ wz.hoursNote = v.slice(0,300); }
+function wzOnHoursNote(v){ wz.hoursNote = v; const c=document.getElementById('wzHoursNoteCount'); if(c) c.textContent=v.length; }
 
 function wzGetHoursForDay(dayKey){
   if(wz.regularClosedDays.includes(dayKey)) return null;
