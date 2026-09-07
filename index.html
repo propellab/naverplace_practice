@@ -426,6 +426,48 @@
   .price-add-btn{background:var(--green-tint);color:var(--green-deep);border:none;border-radius:9px;padding:14px;font-weight:700;font-size:13.5px;cursor:pointer;flex:1;}
   .price-order-btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:14px 18px;font-size:13px;color:var(--gray-700);cursor:pointer;}
   .price-btn-row{display:flex;gap:10px;margin-bottom:16px;}
+  .day-chip-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .day-chip{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;
+    font-size:13.5px;color:var(--gray-700);cursor:pointer;user-select:none;}
+  .day-chip.sel{border-color:var(--green);color:var(--green-deep);font-weight:700;background:var(--green-tint);}
+  .day-chip.dim{opacity:.35;cursor:default;}
+  .time-row{display:flex;align-items:center;gap:10px;}
+  .time-row input[type=time]{border:1.5px solid var(--line);border-radius:9px;padding:11px 12px;font-size:14px;}
+  .time-row .sep{color:var(--gray-500);}
+  .byday-row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);}
+  .byday-row:last-child{border-bottom:none;}
+  .byday-row .dlabel{width:28px;font-weight:700;font-size:13.5px;}
+  .byday-row .closed-tag{color:var(--gray-500);font-size:12.5px;}
+  .date-chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .date-chip{background:var(--surface);border-radius:8px;padding:9px 12px;font-size:13px;display:flex;align-items:center;gap:8px;}
+  .date-chip .x{cursor:pointer;color:var(--gray-500);font-weight:700;}
+  .date-add-row{display:flex;gap:8px;}
+  .date-add-row input{flex:1;border:1.5px solid var(--line);border-radius:9px;padding:11px 12px;font-size:13.5px;}
+  .date-add-row button{padding:0 18px;border-radius:9px;border:none;background:var(--green);color:#fff;font-weight:700;font-size:13px;}
+  .hourmode-row{display:flex;gap:10px;margin-bottom:16px;}
+  .hourmode-btn{flex:1;border:1.5px solid var(--line);border-radius:9px;padding:13px;text-align:center;font-size:13.5px;
+    color:var(--gray-700);cursor:pointer;user-select:none;}
+  .hourmode-btn.sel{border-color:var(--green);color:var(--green-deep);font-weight:700;background:var(--green-tint);}
+  .collapse-row{display:flex;justify-content:space-between;align-items:center;padding:16px 2px;border-bottom:1px solid var(--line);cursor:pointer;}
+  .collapse-row .lbl{font-size:14.5px;font-weight:700;color:var(--ink);}
+  .collapse-row .act{font-size:12.5px;color:var(--green-deep);font-weight:700;}
+  .cal-widget{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;}
+  .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-weight:800;font-size:16px;}
+  .cal-nav{cursor:pointer;color:var(--gray-500);font-size:16px;padding:0 8px;user-select:none;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;}
+  .cal-dow{font-size:11.5px;color:var(--gray-500);padding:6px 0;font-weight:700;}
+  .cal-day{font-size:12.5px;padding:9px 0;border-radius:8px;color:var(--ink);}
+  .cal-day.closed{background:var(--alert-tint);color:var(--alert);font-weight:700;}
+  .cal-day.today{border:1.5px solid var(--ink);font-weight:800;}
+  .cal-day.empty{visibility:hidden;}
+  .cal-note{font-size:11.5px;color:var(--gray-500);margin-top:14px;line-height:1.7;}
+  .hours-summary{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:16px;}
+  .hours-summary-head{font-weight:800;font-size:15px;margin-bottom:14px;}
+  .hours-row{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;color:var(--gray-700);border-bottom:1px dashed var(--line);}
+  .hours-row:last-child{border-bottom:none;}
+  .hours-row .d{font-weight:700;color:var(--ink);}
+  .hours-row .closed-label{color:var(--gray-500);}
+  .hours-summary-note{font-size:11.5px;color:var(--gray-500);margin-top:12px;line-height:1.6;}
   .field-lg textarea{resize:vertical;min-height:100px;line-height:1.65;}
   .field-lg{margin-bottom:16px;}
   .char-count{text-align:right;font-size:12px;color:var(--gray-500);margin-top:6px;}
@@ -790,14 +832,27 @@ let wz = {
   priceModalOpen:false,
   priceModalVariable:false,
   priceModalName:"",
+  // 휴무일·영업시간
+  hasHoliday:null,
+  regularClosedDays:[],
+  holidayNames:[],
+  extraClosedDates:[],
+  hoursMode:'all',
+  hoursAll:{open:'09:00', close:'22:00'},
+  hoursWeekday:{open:'09:00', close:'22:00'},
+  hoursWeekend:{open:'09:00', close:'22:00'},
+  hoursByDay:{'월':{open:'09:00',close:'22:00'},'화':{open:'09:00',close:'22:00'},'수':{open:'09:00',close:'22:00'},'목':{open:'09:00',close:'22:00'},'금':{open:'09:00',close:'22:00'},'토':{open:'09:00',close:'22:00'},'일':{open:'09:00',close:'22:00'}},
+  hoursNoteOpen:false,
+  hoursNote:"",
 };
 let wzFormTab = 'basic';
 function wzSetFormTab(t){
   wzFormTab = t;
-  const bTab = document.getElementById('wzTabBasic'), aTab = document.getElementById('wzTabAdditional'), pTab = document.getElementById('wzTabPrice');
+  const bTab = document.getElementById('wzTabBasic'), aTab = document.getElementById('wzTabAdditional'), pTab = document.getElementById('wzTabPrice'), hTab = document.getElementById('wzTabHours');
   if(bTab) bTab.classList.toggle('active', t==='basic');
   if(aTab) aTab.classList.toggle('active', t==='additional');
   if(pTab) pTab.classList.toggle('active', t==='price');
+  if(hTab) hTab.classList.toggle('active', t==='hours');
   wzRenderForm(); wzRenderPreview();
 }
 
@@ -805,6 +860,8 @@ const FACILITY_OPTS = ["단체 이용 가능","포장","배달","방문접수/�
 const ACCESS_OPTS = ["휠체어 이용가능 출입구","휠체어 이용가능 화장실","휠체어 이용가능 좌석","장애인 주차구역"];
 const PAYMENT_OPTS = ["지역화폐 (지류형)","지역화폐 (카드형)","지역화폐 (모바일형)","제로페이","간편결제"];
 const LINK_TYPES = ["일반","블로그","인스타그램","페이스북","유튜브","기타"];
+const DAY_LIST = ["월","화","수","목","금","토","일"];
+const HOLIDAY_OPTS = ["새해 첫날","설날 연휴","삼일절","노동절","어린이날","부처님오신날","현충일","제헌절","광복절","추석 연휴","개천절","한글날","성탄절"];
 function formatWon(v){ if(!v) return ''; const n = parseInt(String(v).replace(/[^0-9]/g,''),10); if(isNaN(n)) return v; return n.toLocaleString('ko-KR')+'원'; }
 
 function viewWizardShell(){
@@ -817,7 +874,7 @@ function viewWizardShell(){
         <div class="form-tab ${wzFormTab==='basic'?'active':''}" id="wzTabBasic" onclick="wzSetFormTab('basic')">기본정보</div>
         <div class="form-tab ${wzFormTab==='additional'?'active':''}" id="wzTabAdditional" onclick="wzSetFormTab('additional')">부가정보</div>
         <div class="form-tab ${wzFormTab==='price'?'active':''}" id="wzTabPrice" onclick="wzSetFormTab('price')">가격정보</div>
-        <div class="form-tab" onclick="alert('실습에서는 지원하지 않아요')">휴무일·영업시간</div>
+        <div class="form-tab ${wzFormTab==='hours'?'active':''}" id="wzTabHours" onclick="wzSetFormTab('hours')">휴무일·영업시간</div>
       </div>
       <div class="ad-banner">
         <div class="thumb"></div>
@@ -855,6 +912,7 @@ function wzRenderForm(){
   if(wz.reviewMode){ area.innerHTML = wzRenderReview(); return; }
   if(wzFormTab==='additional'){ area.innerHTML = wzRenderAdditionalForm(); wzRenderLinkList(); return; }
   if(wzFormTab==='price'){ area.innerHTML = wzRenderPriceForm(); wzRenderPriceImageGrid(); wzRenderMenuList(); return; }
+  if(wzFormTab==='hours'){ area.innerHTML = wzRenderHoursForm(); wzRenderExtraDateChips(); return; }
 
   area.innerHTML = `
   <div class="form-scroll">
@@ -1298,6 +1356,162 @@ function wzRenderKeywordChips(){
 }
 
 /* ---------------- PRICE INFO (가격정보) ---------------- */
+/* ---------------- HOURS / HOLIDAYS (휴무일·영업시간) ---------------- */
+function timeRangeEditor(obj, target){
+  return `<div class="time-row">
+    <input type="time" value="${obj.open}" onchange="wzOnTimeChange('${target}','open',this.value)"/>
+    <span class="sep">~</span>
+    <input type="time" value="${obj.close}" onchange="wzOnTimeChange('${target}','close',this.value)"/>
+  </div>`;
+}
+function wzOnTimeChange(target, field, value){
+  if(target==='all') wz.hoursAll[field]=value;
+  else if(target==='weekday') wz.hoursWeekday[field]=value;
+  else if(target==='weekend') wz.hoursWeekend[field]=value;
+  else if(DAY_LIST.includes(target)) wz.hoursByDay[target][field]=value;
+  wzRenderPreview();
+}
+
+function wzRenderHoursForm(){
+  return `
+  <div class="form-scroll">
+    <div class="collapse-row" onclick="alert('실습에서는 지원하지 않아요')">
+      <span class="lbl">⇄ 시설별 휴무일·영업시간 설정하기</span><span>›</span>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>휴무일이 있나요?</label>
+        ${toggle2(wz.hasHoliday,'yes','휴무일이 있어요','no','휴무일이 없어요','wzSetHasHoliday')}
+      </div>
+    </div>
+
+    ${wz.hasHoliday==='yes' ? `
+    <div class="sect">
+      <div class="field-lg">
+        <label>정기 휴무일이 있나요?</label>
+        <div class="wz-hint" style="margin:0 0 10px;">💡 <span>매주 반복되는 휴무 요일을 선택하세요.</span></div>
+        <div class="day-chip-row">
+          ${DAY_LIST.map(d=>`<div class="day-chip ${wz.regularClosedDays.includes(d)?'sel':''}" onclick="wzToggleRegularClosed('${d}')">${d}</div>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>공휴일 중 휴무일이 있나요?</label>
+        <div class="price-btn-row" style="margin-bottom:14px;">
+          <div class="subopt-btn ${wz.holidayNames.length===2 && wz.holidayNames.includes('설날 연휴') && wz.holidayNames.includes('추석 연휴')?'sel':''}" onclick="wzSetHolidayPreset('seolchuseok')">설,추석 당일만 휴무</div>
+          <div class="subopt-btn ${wz.holidayNames.length===HOLIDAY_OPTS.length?'sel':''}" onclick="wzSetHolidayPreset('all')">전체 휴무</div>
+        </div>
+        ${chipGroup(HOLIDAY_OPTS, wz.holidayNames, 'wzToggleHoliday')}
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>그 외 휴무일이 있다면?</label>
+        <div class="date-add-row">
+          <input type="date" id="wz-extra-date"/>
+          <button onclick="wzAddExtraDate()">추가</button>
+        </div>
+        <div class="date-chip-row" id="wzExtraDateChips"></div>
+      </div>
+    </div>
+    ` : ``}
+
+    <div class="sect">
+      <div class="field-lg">
+        <label>영업 시간을 알려주세요.</label>
+        <div class="hourmode-row">
+          <div class="hourmode-btn ${wz.hoursMode==='all'?'sel':''}" onclick="wzSetHoursMode('all')">모든 영업일이 같아요</div>
+          <div class="hourmode-btn ${wz.hoursMode==='weekday_weekend'?'sel':''}" onclick="wzSetHoursMode('weekday_weekend')">평일/주말 달라요</div>
+          <div class="hourmode-btn ${wz.hoursMode==='byday'?'sel':''}" onclick="wzSetHoursMode('byday')">요일별로 달라요</div>
+        </div>
+        ${wz.hoursMode==='all' ? timeRangeEditor(wz.hoursAll,'all') : ``}
+        ${wz.hoursMode==='weekday_weekend' ? `
+          <div style="margin-bottom:14px;"><label style="font-size:13px;font-weight:700;margin-bottom:8px;display:block;">평일</label>${timeRangeEditor(wz.hoursWeekday,'weekday')}</div>
+          <div><label style="font-size:13px;font-weight:700;margin-bottom:8px;display:block;">주말</label>${timeRangeEditor(wz.hoursWeekend,'weekend')}</div>
+        ` : ``}
+        ${wz.hoursMode==='byday' ? DAY_LIST.map(d=>{
+          const isClosed = wz.regularClosedDays.includes(d);
+          return `<div class="byday-row"><span class="dlabel">${d}</span>${isClosed ? `<span class="closed-tag">휴무일</span>` : timeRangeEditor(wz.hoursByDay[d], d)}</div>`;
+        }).join("") : ``}
+      </div>
+    </div>
+
+    <div class="collapse-row" onclick="alert('실습에서는 지원하지 않아요')">
+      <span class="lbl">법정공휴일 영업시간이 평소와 다른가요? (단축영업 등)</span><span class="act">설정하기 ⌄</span>
+    </div>
+    <div class="collapse-row" onclick="alert('실습에서는 지원하지 않아요')">
+      <span class="lbl">평상시와 다르게 영업시간을 운영하는 날짜가 있다면?</span><span class="act">설정하기 ⌄</span>
+    </div>
+    <div class="collapse-row" onclick="wzToggleHoursNote()" style="${wz.hoursNoteOpen?'border-bottom:none;':''}">
+      <span class="lbl">영업시간이나 휴무일 관련 추가 안내</span><span class="act">${wz.hoursNoteOpen?'접기 ▲':'입력하기 ⌄'}</span>
+    </div>
+    ${wz.hoursNoteOpen ? `
+    <div class="sect" style="border-bottom:none;">
+      <textarea id="wz-hours-note" maxlength="300" oninput="wzOnHoursNote(this.value); wzCharsetGuard(this)" placeholder="예: 명절 연휴 기간에는 일부 프로그램 운영이 제한될 수 있습니다.">${escapeHtml(wz.hoursNote)}</textarea>
+      <div class="char-count"><span>${wz.hoursNote.length}</span>/300자</div>
+    </div>` : ``}
+
+    <div class="save-btn-wrap">
+      <button class="save-btn" onclick="wzSave()">저장하기</button>
+      <div style="margin-top:14px;"><span class="wz-back" style="display:inline-flex;" onclick="goto('bizdetail')">← 업체 관리로 돌아가기</span></div>
+    </div>
+  </div>`;
+}
+
+function wzSetHasHoliday(v){ wz.hasHoliday = wz.hasHoliday===v?null:v; wzRenderForm(); wzRenderPreview(); }
+function wzToggleRegularClosed(d){ const i=wz.regularClosedDays.indexOf(d); if(i>-1) wz.regularClosedDays.splice(i,1); else wz.regularClosedDays.push(d); wzRenderForm(); wzRenderPreview(); }
+function wzToggleHoliday(name){ const i=wz.holidayNames.indexOf(name); if(i>-1) wz.holidayNames.splice(i,1); else wz.holidayNames.push(name); wzRenderForm(); wzRenderPreview(); }
+function wzSetHolidayPreset(preset){
+  if(preset==='seolchuseok'){ wz.holidayNames = ['설날 연휴','추석 연휴']; }
+  else if(preset==='all'){ wz.holidayNames = [...HOLIDAY_OPTS]; }
+  wzRenderForm(); wzRenderPreview();
+}
+function wzAddExtraDate(){
+  const el = document.getElementById('wz-extra-date');
+  const v = el.value;
+  if(!v) return;
+  if(!wz.extraClosedDates.includes(v)) wz.extraClosedDates.push(v);
+  el.value = "";
+  wzRenderExtraDateChips();
+  wzRenderPreview();
+}
+function wzRemoveExtraDate(i){ wz.extraClosedDates.splice(i,1); wzRenderExtraDateChips(); wzRenderPreview(); }
+function wzRenderExtraDateChips(){
+  const box = document.getElementById('wzExtraDateChips'); if(!box) return;
+  box.innerHTML = wz.extraClosedDates.map((d,i)=>`<div class="date-chip">${escapeHtml(d)}<span class="x" onclick="wzRemoveExtraDate(${i})">✕</span></div>`).join("");
+}
+function wzSetHoursMode(m){ wz.hoursMode = m; wzRenderForm(); wzRenderPreview(); }
+function wzToggleHoursNote(){ wz.hoursNoteOpen = !wz.hoursNoteOpen; wzRenderForm(); }
+function wzOnHoursNote(v){ wz.hoursNote = v.slice(0,300); }
+
+function wzGetHoursForDay(dayKey){
+  if(wz.regularClosedDays.includes(dayKey)) return null;
+  if(wz.hoursMode==='all') return wz.hoursAll;
+  if(wz.hoursMode==='weekday_weekend') return (dayKey==='토'||dayKey==='일') ? wz.hoursWeekend : wz.hoursWeekday;
+  return wz.hoursByDay[dayKey];
+}
+function wzTodayDayKey(){
+  const map = ['일','월','화','수','목','금','토'];
+  return map[new Date().getDay()];
+}
+function wzComputeStatusLine(){
+  if(wz.hasHoliday===null) return null;
+  const dayKey = wzTodayDayKey();
+  const hrs = wzGetHoursForDay(dayKey);
+  if(!hrs) return `정기휴무 (${dayKey}요일)`;
+  const now = new Date();
+  const nowMin = now.getHours()*60+now.getMinutes();
+  const [oh,om] = hrs.open.split(':').map(Number);
+  const [ch,cm] = hrs.close.split(':').map(Number);
+  const openMin = oh*60+om, closeMin = ch*60+cm;
+  const isOpen = nowMin>=openMin && nowMin<closeMin;
+  return isOpen ? `영업 중 · ${hrs.close}에 영업 종료` : `영업 종료 · ${hrs.open}에 영업 시작`;
+}
+
 function wzRenderPriceForm(){
   return `
   <div class="form-scroll">
@@ -1597,7 +1811,11 @@ function wzRenderPreview(){
       <div class="ph-info-section"><h5>발렛파킹</h5><div class="val">${wz.valetAvail==='yes' ? `가능${wz.valetFee?' · '+(wz.valetFee==='paid'?('유료'+(wz.valetPrice?' '+escapeHtml(wz.valetPrice):'')):'무료'):''}` : wz.valetAvail==='no' ? '불가' : `<span class="ph-empty">정보 없음</span>`}</div></div>
       ${wz.parkingDetail ? `<div class="ph-info-section"><h5>주차 상세 안내</h5><div class="val">${escapeHtml(wz.parkingDetail)}</div></div>` : ``}
       <div class="ph-info-section"><h5>결제수단</h5><div class="val">${wz.payment.length ? wz.payment.map(p=>`<span class="ph-tag">${escapeHtml(p)}</span>`).join("") : `<span class="ph-empty">정보 없음</span>`}</div></div>
-      <div class="ph-info-section" style="border-bottom:none;"><h5>홈페이지/SNS</h5><div class="val">${wz.links.length ? wz.links.map(l=>`<div style="margin-bottom:4px;">${escapeHtml(l.type)} · ${escapeHtml(l.url)}</div>`).join("") : `<span class="ph-empty">정보 없음</span>`}</div></div>`;
+      <div class="ph-info-section"><h5>홈페이지/SNS</h5><div class="val">${wz.links.length ? wz.links.map(l=>`<div style="margin-bottom:4px;">${escapeHtml(l.type)} · ${escapeHtml(l.url)}</div>`).join("") : `<span class="ph-empty">정보 없음</span>`}</div></div>
+      <div class="ph-info-section" style="border-bottom:none;"><h5>영업시간</h5><div class="val">${wz.hasHoliday===null ? `<span class="ph-empty">정보 없음</span>` : DAY_LIST.map(d=>{
+        const hrs = wzGetHoursForDay(d);
+        return `<div class="ph-price-row"><span>${d}요일</span><span class="amt">${hrs ? hrs.open+' - '+hrs.close : '정기휴무'}</span></div>`;
+      }).join("")}</div></div>`;
   }
 
   screen.innerHTML = `
@@ -1610,7 +1828,7 @@ function wzRenderPreview(){
       <div class="ph-title-block">
         <div class="pname">${wz.name ? escapeHtml(wz.name) : "상호명을 입력해보세요"}</div>
         <div class="pmeta">${catHtml} · 리뷰 0</div>
-        <div class="pmeta">영업 중 · 22:00에 영업 종료 <span class="ph-placeholder-note">(예시)</span></div>
+        <div class="pmeta">${wzComputeStatusLine() || `영업 중 · 22:00에 영업 종료 <span class="ph-placeholder-note">(예시)</span>`}</div>
       </div>
       ${actionBar}
       <div class="ph-carousel">${carouselSlides}</div>
