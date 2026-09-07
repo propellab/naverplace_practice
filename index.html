@@ -279,30 +279,76 @@
   .phone{width:100%;max-width:340px;margin:0 auto;background:#1b1b1b;border-radius:36px;padding:12px;
     box-shadow:0 20px 40px rgba(0,0,0,.18);}
   .phone-notch{width:90px;height:18px;background:#1b1b1b;border-radius:0 0 14px 14px;margin:0 auto;}
-  .phone-screen{background:#fff;border-radius:26px;overflow:hidden;height:640px;overflow-y:auto;}
-  .ph-photo{position:relative;height:190px;background:linear-gradient(135deg,#dfe3e6,#eef0f1);
-    display:flex;align-items:center;justify-content:center;color:var(--gray-300);font-size:12px;}
-  .ph-photo img{width:100%;height:100%;object-fit:cover;}
-  .ph-photo .anchor-flag{position:absolute;top:8px;left:8px;background:rgba(3,199,90,.92);color:#fff;
-    font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;}
-  .ph-dots{position:absolute;bottom:8px;right:10px;background:rgba(0,0,0,.45);color:#fff;font-size:10px;
-    padding:2px 7px;border-radius:8px;}
-  .ph-body{padding:14px 16px 24px;}
-  .ph-cat{font-size:11.5px;color:var(--green-deep);font-weight:700;margin-bottom:4px;}
-  .ph-name{font-size:19px;font-weight:800;margin:0 0 6px;word-break:keep-all;}
-  .ph-meta{font-size:11.5px;color:var(--gray-500);margin-bottom:14px;}
-  .ph-actions{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
-  .ph-actions button{flex:1;min-width:64px;border:1px solid var(--line);background:#fff;border-radius:8px;
-    padding:9px 4px;font-size:11.5px;font-weight:700;color:var(--gray-700);}
-  .ph-actions button.primary{background:var(--green-tint);border-color:var(--green);color:var(--green-deep);}
-  .ph-section{margin-bottom:18px;} .ph-section h4{font-size:12px;font-weight:700;color:var(--gray-500);margin:0 0 8px;}
-  .ph-intro{font-size:13px;line-height:1.65;color:var(--gray-700);word-break:keep-all;}
-  .ph-intro .anchor{background:linear-gradient(180deg,transparent 60%, var(--green-tint) 60%);border-bottom:1.5px solid var(--green);}
-  .ph-way{font-size:12.5px;line-height:1.6;color:var(--gray-700);background:var(--surface);border-radius:8px;padding:10px 12px;}
+  .phone-screen{background:#fff;border-radius:26px;overflow:hidden;height:640px;overflow-y:auto;
+    display:flex;flex-direction:column;}
+  .ph-scroll{flex:1;overflow-y:auto;}
+
+  .ph-topbar{display:flex;align-items:center;gap:8px;padding:12px 14px 8px;flex-shrink:0;}
+  .ph-topbar .back{font-size:17px;color:var(--gray-700);}
+  .ph-topbar .title{flex:1;font-size:14.5px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ph-topbar .star{font-size:15px;color:var(--gray-300);}
+
+  .ph-carousel{display:flex;gap:2px;overflow-x:auto;background:var(--surface);}
+  .ph-carousel .slide{flex:0 0 50%;aspect-ratio:1/1;background:linear-gradient(135deg,#dfe3e6,#eef0f1);
+    display:flex;align-items:center;justify-content:center;color:var(--gray-300);font-size:11px;}
+  .ph-carousel .slide img{width:100%;height:100%;object-fit:cover;}
+
+  .ph-title-block{padding:14px 16px 4px;}
+  .ph-title-block .pname{font-size:19px;font-weight:800;color:var(--ink);word-break:keep-all;}
+  .ph-title-block .pmeta{font-size:12px;color:var(--gray-500);margin-top:5px;}
+
+  .ph-actionbar{display:flex;gap:6px;padding:12px 16px 14px;}
+  .ph-actionbar .pill{flex:1;border-radius:20px;padding:9px 2px;text-align:center;font-size:10.5px;font-weight:700;
+    border:1px solid var(--line);color:var(--gray-700);background:#fff;}
+  .ph-actionbar .pill.primary{background:#3B82F6;color:#fff;border-color:#3B82F6;}
+  .ph-actionbar .pill.dim{opacity:.4;}
+
+  .ph-tabbar{display:flex;gap:16px;padding:0 16px;border-bottom:1px solid var(--line);overflow-x:auto;flex-shrink:0;}
+  .ph-tabbar span{font-size:12px;color:var(--gray-500);padding:10px 0;white-space:nowrap;}
+  .ph-tabbar span.active{color:var(--ink);font-weight:800;border-bottom:2px solid var(--ink);}
+
+  .ph-coupon{background:var(--surface);border-radius:10px;margin:12px 16px;padding:12px 14px;
+    display:flex;justify-content:space-between;align-items:center;}
+  .ph-coupon .l{font-size:11.5px;color:var(--gray-700);} .ph-coupon .l b{color:var(--ink);}
+  .ph-coupon .r{font-size:11px;color:var(--green-deep);font-weight:700;}
+  .ph-news{margin:0 16px 14px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+    display:flex;gap:10px;align-items:center;font-size:11.5px;color:var(--gray-700);}
+  .ph-news .thumb{width:34px;height:34px;border-radius:7px;background:var(--surface);flex-shrink:0;}
+
+  .ph-row{display:flex;gap:10px;padding:11px 16px;border-bottom:6px solid var(--surface);}
+  .ph-row .ic{width:16px;flex-shrink:0;text-align:center;color:var(--gray-500);font-size:13px;padding-top:1px;}
+  .ph-row .body{flex:1;min-width:0;font-size:12px;color:var(--gray-700);line-height:1.55;}
+  .ph-row .body .maintext{font-size:13px;color:var(--ink);font-weight:600;}
+  .ph-row .body .links{margin-top:4px;color:#3B82F6;font-size:11px;}
+  .ph-subway-badge{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;
+    border-radius:50%;background:var(--green-deep);color:#fff;font-size:9px;font-weight:800;margin-right:5px;}
+  .ph-intro-preview{font-size:12.5px;color:var(--gray-700);line-height:1.6;word-break:keep-all;}
+  .ph-intro-preview .anchor{background:linear-gradient(180deg,transparent 60%, var(--green-tint) 60%);border-bottom:1.5px solid var(--green);}
+  .ph-price-row{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px dashed var(--line);}
+  .ph-price-row:last-child{border-bottom:none;}
+  .ph-price-row .amt{color:var(--gray-500);}
+  .ph-tag{display:inline-block;background:var(--surface);border-radius:6px;padding:4px 9px;font-size:10.5px;margin:2px 4px 2px 0;color:var(--gray-700);}
   .ph-empty{color:var(--gray-300);font-style:italic;}
-  .ph-thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;}
-  .ph-thumbs div{aspect-ratio:1/1;background:var(--surface);border-radius:6px;overflow:hidden;}
-  .ph-thumbs img{width:100%;height:100%;object-fit:cover;}
+  .ph-placeholder-note{font-size:9.5px;color:var(--gray-300);margin-top:3px;}
+  .ph-sticky-footer{flex-shrink:0;background:#fff;border-top:1px solid var(--line);display:flex;gap:6px;padding:8px 12px;}
+  .ph-tab-empty{padding:70px 24px;text-align:center;color:var(--gray-300);font-size:12px;line-height:1.7;}
+  .ph-newscard{border:1px solid var(--line);border-radius:10px;margin:12px 16px;padding:10px 12px;
+    display:flex;gap:10px;align-items:center;font-size:11.5px;color:var(--gray-700);}
+  .ph-newscard .thumb{width:44px;height:44px;border-radius:8px;background:var(--surface);flex-shrink:0;}
+  .ph-newscard .date{font-size:10px;color:var(--gray-500);margin-bottom:2px;}
+  .ph-reviewcard{padding:13px 16px;border-bottom:1px solid var(--line);}
+  .ph-reviewcard .rtop{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .ph-reviewcard .avatar{width:26px;height:26px;border-radius:50%;background:var(--surface);flex-shrink:0;}
+  .ph-reviewcard .rname{font-size:12px;font-weight:700;color:var(--ink);}
+  .ph-reviewcard .stars{color:#F5A623;font-size:11px;}
+  .ph-reviewcard .rtext{font-size:12px;color:var(--gray-700);line-height:1.55;}
+  .ph-photogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:6px;}
+  .ph-photogrid div{aspect-ratio:1/1;background:var(--surface);overflow:hidden;}
+  .ph-photogrid img{width:100%;height:100%;object-fit:cover;}
+  .ph-info-section{padding:14px 16px;border-bottom:6px solid var(--surface);}
+  .ph-info-section h5{font-size:10.5px;color:var(--gray-500);font-weight:700;margin:0 0 6px;letter-spacing:.02em;}
+  .ph-info-section .val{font-size:12.5px;color:var(--ink);line-height:1.65;word-break:keep-all;}
+  .ph-example-badge{display:inline-block;font-size:9.5px;color:var(--gray-300);margin-left:6px;font-weight:400;}
   .wz-footnote{text-align:center;font-size:11.5px;color:var(--gray-500);margin-top:12px;line-height:1.5;}
 
   /* ===================== FULL 기본정보 FORM (matches real SmartPlace layout) ===================== */
@@ -358,6 +404,14 @@
   .kw-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
   .kw-chip{background:var(--surface);border-radius:8px;padding:9px 12px;font-size:13.5px;display:flex;align-items:center;gap:8px;}
   .kw-chip .x{cursor:pointer;color:var(--gray-500);font-weight:700;}
+  .menu-input-row{display:flex;gap:8px;margin-bottom:6px;}
+  .menu-input-row input:first-child{flex:2;}
+  .menu-input-row input:nth-child(2){flex:1;}
+  .menu-input-row button{padding:0 20px;border-radius:9px;border:none;background:var(--surface);color:var(--gray-500);font-weight:700;font-size:13px;}
+  .menu-row{display:flex;justify-content:space-between;align-items:center;padding:11px 2px;border-bottom:1px dashed var(--line);font-size:13.5px;}
+  .menu-row:last-child{border-bottom:none;}
+  .menu-row .mprice{color:var(--gray-500);margin-right:12px;}
+  .menu-row .x{cursor:pointer;color:var(--gray-500);font-weight:700;}
   .phone-row{display:flex;gap:8px;}
   .phone-row select{width:90px;flex-shrink:0;}
   .smartcall-box{margin-top:14px;background:var(--surface);border-radius:10px;padding:16px 18px;}
@@ -654,6 +708,7 @@ let wz = {
   photos:[],
   intro:"",
   keywords:[],
+  menuItems:[],
   phoneCode:"02", phoneNum:"", smartcall:true,
   addr1:"", addr2:"",
   locationConfirmed:false,
@@ -779,6 +834,19 @@ function wzRenderForm(){
 
     <div class="sect">
       <div class="field-lg">
+        <label>메뉴/가격표</label>
+        <div class="wz-hint" style="margin:0 0 10px;">💡 <span>메뉴 또는 서비스명과 가격을 입력해주세요. 가격을 비워두면 손님에게 "변동"으로 표시됩니다.</span></div>
+        <div class="menu-input-row">
+          <input type="text" id="wz-menu-name" placeholder="메뉴명 (예: 1:1 클래식 필라테스)" onkeydown="if(event.key==='Enter')wzAddMenuItem()"/>
+          <input type="text" id="wz-menu-price" placeholder="가격 (선택)" onkeydown="if(event.key==='Enter')wzAddMenuItem()"/>
+          <button onclick="wzAddMenuItem()">추가</button>
+        </div>
+        <div id="wzMenuList"></div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="field-lg">
         <label>전화번호를 입력해주세요.<span class="req">필수</span></label>
         <div class="phone-row">
           <select id="wz-phone-code" onchange="wzOnPhoneCode(this.value)">
@@ -862,6 +930,7 @@ function wzRenderForm(){
 
   wzRenderPhotoGrid();
   wzRenderKeywordChips();
+  wzRenderMenuList();
   wzUpdateFeedback();
 }
 
@@ -968,6 +1037,32 @@ function wzRenderKeywordChips(){
   if(addBtn) addBtn.classList.toggle('active', wz.keywords.length<5);
 }
 
+/* ---------------- MENU / PRICE LIST ---------------- */
+function wzAddMenuItem(){
+  const nameEl = document.getElementById('wz-menu-name');
+  const priceEl = document.getElementById('wz-menu-price');
+  const name = nameEl.value.trim();
+  if(!name) return;
+  const price = priceEl.value.trim();
+  wz.menuItems.push({name, price});
+  nameEl.value = ""; priceEl.value = "";
+  wzRenderMenuList();
+  wzRenderPreview();
+  nameEl.focus();
+}
+function wzRemoveMenuItem(i){ wz.menuItems.splice(i,1); wzRenderMenuList(); wzRenderPreview(); }
+function wzRenderMenuList(){
+  const box = document.getElementById('wzMenuList'); if(!box) return;
+  box.innerHTML = wz.menuItems.map((m,i)=>`
+    <div class="menu-row">
+      <span>${escapeHtml(m.name)}</span>
+      <span style="display:flex;align-items:center;">
+        <span class="mprice">${m.price ? escapeHtml(m.price) : '변동'}</span>
+        <span class="x" onclick="wzRemoveMenuItem(${i})">✕</span>
+      </span>
+    </div>`).join("");
+}
+
 /* ---------------- PHOTOS ---------------- */
 function wzRenderPhotoGrid(){
   const grid = document.getElementById('wzPhotoGrid'); if(!grid) return;
@@ -1000,32 +1095,138 @@ function wzPickPhoto(){
 }
 
 /* ---------------- PHONE PREVIEW ---------------- */
+let wzPreviewTab = 'home';
+function wzSetTab(t){ wzPreviewTab = t; wzRenderPreview(); }
+
+const PH_TABS = [
+  {id:'home', label:'홈'},
+  {id:'news', label:'소식'},
+  {id:'review', label:'리뷰'},
+  {id:'photo', label:'사진'},
+  {id:'map', label:'지도'},
+  {id:'nearby', label:'주변'},
+  {id:'info', label:'정보'},
+];
+
 function wzRenderPreview(){
   const screen = document.getElementById('wzPhone'); if(!screen) return;
-  const firstPhoto = wz.photos[0];
   const introHtml = wz.intro ? wzHighlightAnchor(wz.intro) : `<span class="ph-empty">아직 작성된 소개글이 없습니다</span>`;
   const wayHtml = wz.way ? escapeHtml(wz.way) : `<span class="ph-empty">찾아오는 길 정보가 없습니다</span>`;
+  const addrHtml = wz.addr1 ? `${escapeHtml(wz.addr1)}${wz.addr2 ? ' ' + escapeHtml(wz.addr2) : ''}` : `<span class="ph-empty">주소가 입력되지 않았습니다</span>`;
+  const phoneHtml = wz.phoneNum ? `${wz.phoneCode}-${escapeHtml(wz.phoneNum)}` : `<span class="ph-empty">전화번호가 입력되지 않았습니다</span>`;
+  const catHtml = wz.category ? escapeHtml(wz.category) : "업종 미입력";
+  const hasPhone = wz.phoneNum.length > 0;
+  const photoCount = wz.photos.length;
+
+  const carouselSlides = photoCount
+    ? wz.photos.slice(0,4).map(p=>`<div class="slide"><img src="${p}"/></div>`).join("")
+    : `<div class="slide">대표사진</div><div class="slide">사진을 등록해보세요</div>`;
+
+  const actionBar = `
+    <div class="ph-actionbar">
+      <div class="pill">↑ 길찾기</div>
+      <div class="pill">⇗ 공유</div>
+      <div class="pill">🔔 알림받기</div>
+    </div>`;
+
+  const tabbarHtml = `
+    <div class="ph-tabbar">
+      ${PH_TABS.map(t=>`<span class="${t.id===wzPreviewTab?'active':''}" onclick="wzSetTab('${t.id}')">${t.label}</span>`).join("")}
+    </div>`;
+
+  let contentHtml = "";
+  if(wzPreviewTab==='home'){
+    contentHtml = `
+      <div class="ph-row">
+        <div class="ic">📍</div>
+        <div class="body"><div class="maintext">${addrHtml}</div><div class="links">지도 · 내비게이션 · 거리뷰</div></div>
+      </div>
+      <div class="ph-row">
+        <div class="ic">🚇</div>
+        <div class="body"><span class="ph-empty">정보 없음</span></div>
+      </div>
+      <div class="ph-row">
+        <div class="ic">↗</div>
+        <div class="body"><div class="ph-intro-preview">${wayHtml}</div></div>
+      </div>
+      <div class="ph-row">
+        <div class="ic">☎</div>
+        <div class="body">${phoneHtml}${hasPhone ? ` <span style="color:#3B82F6;">· 복사</span>` : ``}</div>
+      </div>
+      <div class="ph-row">
+        <div class="ic">₩</div>
+        <div class="body">${wz.menuItems.length ? wz.menuItems.map(m=>`<div class="ph-price-row"><span>${escapeHtml(m.name)}</span><span class="amt">${m.price?escapeHtml(m.price):'변동'}</span></div>`).join("") : ``}</div>
+      </div>
+      <div class="ph-row">
+        <div class="ic">🌐</div>
+        <div class="body"><span class="ph-empty">정보 없음</span></div>
+      </div>
+      <div class="ph-row" style="border-bottom:none;">
+        <div class="ic">🏬</div>
+        <div class="body"><span class="ph-empty">정보 없음</span></div>
+      </div>`;
+  }
+  else if(wzPreviewTab==='news'){
+    contentHtml = `
+      <div class="ph-newscard"><div class="thumb"></div><div><div class="date">2026.08.24 <span class="ph-example-badge">예시</span></div>웰컴 오퍼 — 첫 방문 혜택 안내</div></div>
+      <div class="ph-newscard"><div class="thumb"></div><div><div class="date">2026.07.02 <span class="ph-example-badge">예시</span></div>여름 시즌 프로그램 오픈</div></div>
+      <div class="ph-newscard"><div class="thumb"></div><div><div class="date">2026.05.14 <span class="ph-example-badge">예시</span></div>신규 강사진 합류 소식</div></div>
+      <div class="ph-tab-empty">소식은 예시 화면입니다.<br/>실습에서는 작성하지 않아요.</div>`;
+  }
+  else if(wzPreviewTab==='review'){
+    const revs = [
+      {n:"방문자***", s:"★★★★★", t:"시설이 깨끗하고 선생님이 꼼꼼하게 봐주셔서 좋았어요."},
+      {n:"예약자***", s:"★★★★☆", t:"위치 찾기 쉽고 주차도 편했습니다."},
+    ];
+    contentHtml = `
+      ${revs.map(r=>`
+        <div class="ph-reviewcard">
+          <div class="rtop"><div class="avatar"></div><div><div class="rname">${r.n}</div><div class="stars">${r.s}</div></div></div>
+          <div class="rtext">${r.t}</div>
+        </div>`).join("")}
+      <div class="ph-tab-empty">리뷰는 예시 화면입니다.<br/>실습에서는 실제 리뷰가 쌓이지 않아요.</div>`;
+  }
+  else if(wzPreviewTab==='photo'){
+    if(photoCount){
+      contentHtml = `<div class="ph-photogrid">${wz.photos.map(p=>`<div><img src="${p}"/></div>`).join("")}</div>`;
+    } else {
+      contentHtml = `<div class="ph-tab-empty">아직 등록된 사진이 없습니다.<br/>대표 사진 단계에서 사진을 추가해보세요.</div>`;
+    }
+  }
+  else if(wzPreviewTab==='map'){
+    contentHtml = `<div class="ph-tab-empty">🗺️<br/><br/>지도 탭은 예시 화면이에요.<br/>실습에서는 지원하지 않습니다.</div>`;
+  }
+  else if(wzPreviewTab==='nearby'){
+    contentHtml = `<div class="ph-tab-empty">📍<br/><br/>주변 탭은 예시 화면이에요.<br/>실습에서는 지원하지 않습니다.</div>`;
+  }
+  else if(wzPreviewTab==='info'){
+    contentHtml = `
+      <div class="ph-info-section"><h5>상호명</h5><div class="val">${wz.name ? escapeHtml(wz.name) : `<span class="ph-empty">미입력</span>`}</div></div>
+      <div class="ph-info-section"><h5>업종</h5><div class="val">${catHtml}</div></div>
+      <div class="ph-info-section"><h5>전화번호</h5><div class="val">${phoneHtml}</div></div>
+      <div class="ph-info-section"><h5>주소</h5><div class="val">${addrHtml}</div></div>
+      <div class="ph-info-section"><h5>찾아오는 길</h5><div class="val">${wayHtml}</div></div>
+      <div class="ph-info-section"><h5>소개</h5><div class="val ph-intro-preview">${introHtml}</div></div>
+      ${wz.keywords.length ? `<div class="ph-info-section"><h5>대표키워드</h5><div class="val">${wz.keywords.map(k=>`<span class="ph-tag">${escapeHtml(k)}</span>`).join("")}</div></div>` : ``}
+      <div class="ph-info-section" style="border-bottom:none;"><h5>메뉴/가격표</h5><div class="val">${wz.menuItems.length ? wz.menuItems.map(m=>`<div class="ph-price-row"><span>${escapeHtml(m.name)}</span><span class="amt">${m.price?escapeHtml(m.price):'변동'}</span></div>`).join("") : ``}</div></div>`;
+  }
+
   screen.innerHTML = `
-    <div class="ph-photo">
-      ${firstPhoto ? `<img src="${firstPhoto}"/><div class="anchor-flag">대표사진</div>` : `사진을 등록해보세요`}
-      ${wz.photos.length ? `<div class="ph-dots">1 / ${wz.photos.length}</div>` : ``}
+    <div class="ph-topbar">
+      <span class="back">‹</span>
+      <span class="title">${wz.name ? escapeHtml(wz.name) : "상호명을 입력해보세요"}</span>
+      <span class="star">☆</span>
     </div>
-    <div class="ph-body">
-      <div class="ph-cat">${wz.category ? escapeHtml(wz.category) : "업종 미입력"}</div>
-      <div class="ph-name">${wz.name ? escapeHtml(wz.name) : "상호명을 입력해보세요"}</div>
-      <div class="ph-meta">방문자 리뷰 0 · 저장 0</div>
-      <div class="ph-actions">
-        <button class="primary">전화</button>
-        <button>예약</button>
-        <button>톡톡</button>
-        <button>저장</button>
+    <div class="ph-scroll">
+      <div class="ph-title-block">
+        <div class="pname">${wz.name ? escapeHtml(wz.name) : "상호명을 입력해보세요"}</div>
+        <div class="pmeta">${catHtml} · 리뷰 0</div>
+        <div class="pmeta">영업 중 · 22:00에 영업 종료 <span class="ph-placeholder-note">(예시)</span></div>
       </div>
-      <div class="ph-section"><h4>소개</h4><div class="ph-intro">${introHtml}</div></div>
-      ${wz.keywords.length ? `<div class="ph-section"><h4>대표키워드</h4><div style="display:flex;flex-wrap:wrap;gap:6px;">${wz.keywords.map(k=>`<span style="background:var(--surface);border-radius:6px;padding:4px 9px;font-size:11.5px;">${escapeHtml(k)}</span>`).join("")}</div></div>` : ``}
-      <div class="ph-section"><h4>찾아오는 길</h4><div class="ph-way">${wayHtml}</div></div>
-      <div class="ph-section"><h4>사진 ${wz.photos.length}</h4>
-        <div class="ph-thumbs">${wz.photos.slice(0,5).map(p=>`<div><img src="${p}"/></div>`).join("")}${'<div></div>'.repeat(Math.max(0,5-wz.photos.length))}</div>
-      </div>
+      ${actionBar}
+      <div class="ph-carousel">${carouselSlides}</div>
+      ${tabbarHtml}
+      ${contentHtml}
     </div>`;
 }
 function wzHighlightAnchor(text){
