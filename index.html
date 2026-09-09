@@ -312,6 +312,36 @@
   .cp-preview-row .k{color:var(--gray-700);font-weight:600;}
   .cp-preview-row .v{color:var(--gray-500);}
   .cp-preview-row .v.set{color:var(--green-deep);font-weight:700;}
+
+  .cp-toggle2{display:flex;gap:14px;margin-bottom:14px;}
+  .cp-toggle2-btn{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:16px;text-align:center;
+    font-size:14.5px;font-weight:700;color:var(--gray-700);cursor:pointer;}
+  .cp-toggle2-btn.sel{border-color:var(--green);color:var(--green-deep);background:var(--green-tint);}
+  .cp-info-row{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);
+    border-radius:9px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--gray-700);cursor:pointer;}
+  .cp-info-row .lbl{display:flex;align-items:center;gap:8px;}
+  .cp-info-expand{border:1px solid var(--line);border-top:none;border-radius:0 0 9px 9px;margin:-14px 0 14px;
+    padding:16px;background:var(--surface);font-size:12.5px;color:var(--gray-700);line-height:1.7;}
+  .cp-info-examples{display:flex;gap:10px;margin-top:14px;}
+  .cp-info-example{flex:1;background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;
+    text-align:center;font-size:11px;color:var(--gray-500);}
+  .cp-info-example .box{height:70px;background:var(--white);border:1px dashed var(--line);border-radius:6px;
+    margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+  .cp-usage-row{display:flex;gap:14px;margin-bottom:14px;}
+  .cp-usage-btn{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:20px;text-align:center;cursor:pointer;}
+  .cp-usage-btn.sel{border-color:var(--green);background:var(--green-tint);}
+  .cp-usage-btn .ic{font-size:24px;margin-bottom:8px;}
+  .cp-usage-btn .t{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .cp-usage-btn .d{font-size:12px;color:var(--gray-500);line-height:1.5;}
+  .cp-days-input{display:flex;align-items:center;gap:10px;margin-top:14px;}
+  .cp-days-input input{width:100px;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;text-align:center;}
+  .cp-days-input span{font-size:13.5px;color:var(--gray-700);}
+  .cp-radio-row{display:flex;align-items:center;gap:10px;padding:10px 0;font-size:14px;color:var(--gray-700);cursor:pointer;}
+  .cp-radio{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;}
+  .cp-radio.on{border-color:var(--green);}
+  .cp-radio.on::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--green);}
+  .cp-radio-row input{width:80px;border:1.5px solid var(--line);border-radius:7px;padding:8px 10px;font-size:13.5px;text-align:center;}
   .biz-hero{
     position:relative;height:230px;background:linear-gradient(135deg,#cfd6da,#e7ebed);
     display:flex;flex-direction:column;justify-content:flex-end;padding:22px 28px;color:#fff;
@@ -1098,12 +1128,13 @@ function cpRenderListItem(c, i){
   const benefit = c.mode==='percent'
     ? `${c.amount||0}% 할인${c.maxCap && c.maxAmount ? ` (최대 ${formatWon(c.maxAmount)})` : ''}`
     : `${formatWon(c.amount)} 할인`;
-  const targetLabel = c.target==='all' ? '모든 고객' : c.target==='notify' ? '혜택 알림받기한 고객' : '대상 미설정';
+  const targetLabel = cpTargetLabel(c.target) || '대상 미설정';
+  const usageLabel = cpUsageLabel(c.usagePlace) || '';
   return `
     <div class="cp-list-item">
       <div>
         <div class="name">${benefit}</div>
-        <div class="sub">${targetLabel} 대상 · 단독 사용 불가</div>
+        <div class="sub">${targetLabel} 대상${usageLabel ? ' · ' + usageLabel : ''}${c.validity ? ' · ' + c.validity : ''} · 단독 사용 불가</div>
       </div>
       <div class="del" onclick="wzDeleteCoupon(${i})">삭제</div>
     </div>`;
@@ -1112,6 +1143,11 @@ function wzDeleteCoupon(i){ wz.coupons.splice(i,1); render(); }
 
 function initCouponCreate(){
   wz.cpType = null; wz.cpMode = null; wz.cpAmount = ""; wz.cpMaxCap = false; wz.cpMaxAmount = ""; wz.cpTarget = null;
+  wz.cpExposure = null; wz.cpExposureInfoOpen = false;
+  wz.cpUsagePlace = null; wz.cpUsageInfoOpen = false;
+  wz.cpValidity = null; wz.cpValidityDays = "30";
+  wz.cpQuantityLimit = null; wz.cpQuantityCount = "";
+  wz.cpPerPerson = 'limited'; wz.cpPerPersonCount = "1";
   cpRenderForm();
   cpRenderPreview();
 }
@@ -1171,12 +1207,96 @@ function cpRenderForm(){
 
     <div class="cp-section">
       <div class="cp-q">누구에게 쿠폰을 제공하시겠어요? <span class="req">*필수</span></div>
-      <div class="cp-target-row">
-        <div class="cp-target-btn ${wz.cpTarget==='all'?'sel':''}" onclick="wzCpSetTarget('all')">모든 고객에게 제공</div>
-        <div class="cp-target-btn ${wz.cpTarget==='notify'?'sel':''}" onclick="wzCpSetTarget('notify')">혜택 알림받기한 고객에게 제공</div>
-        <div class="cp-target-btn disabled">마케팅메시지 수신 고객에게 제공</div>
+      <div class="cp-target-row" style="flex-wrap:wrap;">
+        <div class="cp-target-btn ${wz.cpTarget==='all'?'sel':''}" onclick="wzCpSetTarget('all')" style="min-width:calc(50% - 7px);">모든 고객에게 제공</div>
+        <div class="cp-target-btn ${wz.cpTarget==='notify'?'sel':''}" onclick="wzCpSetTarget('notify')" style="min-width:calc(50% - 7px);">혜택 알림받기한 고객에게 제공</div>
+        <div class="cp-target-btn ${wz.cpTarget==='marketing'?'sel':''}" onclick="wzCpSetTarget('marketing')" style="min-width:calc(50% - 7px);">마케팅메시지 수신 고객에게 제공</div>
+        <div class="cp-target-btn ${wz.cpTarget==='npay'?'sel':''}" onclick="wzCpSetTarget('npay')" style="min-width:calc(50% - 7px);">Npay 커넥트 리뷰작성 고객에게 제공</div>
       </div>
-      <div class="cp-target-note">* 톡톡 파트너센터 계정 등록 후 마케팅메시지 수신고객 대상 쿠폰을 만들 수 있습니다. <a href="#" onclick="return false;">자세히 보기 ›</a></div>
+      <div class="cp-target-note">ⓘ 우리 업체 홈에서 모든 고객이 쿠폰을 다운로드 할 수 있습니다. <a href="#" onclick="return false;">자세히 보기 ›</a></div>
+    </div>
+
+    <div class="cp-section">
+      <div class="cp-q">쿠폰 노출 기간을 선택해 주세요. <span class="req">*필수</span></div>
+      <div style="font-size:12.5px;color:var(--gray-500);margin-bottom:14px;">상시 노출을 선택하는 경우, 쿠폰 발행과 동시에 고객들이 쿠폰을 다운로드 할 수 있습니다.</div>
+      <div class="cp-info-row" onclick="wzCpToggleExposureInfo()">
+        <span class="lbl">ⓘ 쿠폰은 어디에 노출되나요?</span>
+        <span>${wz.cpExposureInfoOpen ? '자세히 보기 ▲' : '자세히 보기 ▼'}</span>
+      </div>
+      ${wz.cpExposureInfoOpen ? `
+      <div class="cp-info-expand">
+        발행한 쿠폰은 우리 업체 홈 뿐만 아니라 검색결과 등 네이버 서비스의 다양한 영역에 노출됩니다.
+        <div class="cp-info-examples">
+          <div class="cp-info-example"><div class="box">🔍</div>검색 목록의 업체정보에도</div>
+          <div class="cp-info-example"><div class="box">📍</div>쿠폰 필터 선택하면 더 크게 보여요</div>
+          <div class="cp-info-example"><div class="box">🏠</div>우리 업체 홈에서도 볼 수 있어요</div>
+        </div>
+      </div>` : ``}
+      <div class="cp-toggle2">
+        <div class="cp-toggle2-btn ${wz.cpExposure==='always'?'sel':''}" onclick="wzCpSetExposure('always')">상시 노출</div>
+        <div class="cp-toggle2-btn ${wz.cpExposure==='period'?'sel':''}" onclick="wzCpSetExposure('period')">일정 기간</div>
+      </div>
+    </div>
+
+    <div class="cp-section">
+      <div class="cp-q">쿠폰을 어디에서 사용할 수 있나요? <span class="req">*필수</span></div>
+      <div class="cp-usage-row">
+        <div class="cp-usage-btn ${wz.cpUsagePlace==='anywhere'?'sel':''}" onclick="wzCpSetUsagePlace('anywhere')">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--gray-300);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin:0 auto 10px;">전체</div>
+          <div class="t">방문 · N예약 · N주문</div><div class="d">방문, N예약, N주문<br/>관계없이 사용 가능해요</div>
+        </div>
+        <div class="cp-usage-btn ${wz.cpUsagePlace==='booking'?'sel':''}" onclick="wzCpSetUsagePlace('booking')">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin:0 auto 10px;">N</div>
+          <div class="t">N예약</div><div class="d">네이버 예약에서만<br/>사용가능한 쿠폰이에요</div>
+        </div>
+      </div>
+      <div class="cp-info-row" onclick="wzCpToggleUsageInfo()">
+        <span class="lbl">ⓘ 쿠폰 사용 장소에 대해 더 알아봐요</span>
+        <span>${wz.cpUsageInfoOpen ? '자세히 보기 ▲' : '자세히 보기 ▼'}</span>
+      </div>
+      ${wz.cpUsageInfoOpen ? `<div class="cp-info-expand">방문 매장 결제, 네이버 예약, 네이버 주문 등 실제 쿠폰이 쓰이는 채널을 제한할 수 있어요. 예약 전용 쿠폰으로 만들면, 예약 전환을 유도하는 데 효과적이에요.</div>` : ``}
+    </div>
+
+    <div class="cp-section">
+      <div class="cp-q">쿠폰 유효 기간을 선택해 주세요. <span class="req">*필수</span></div>
+      <div class="cp-toggle2">
+        <div class="cp-toggle2-btn ${wz.cpValidity==='issue'?'sel':''}" onclick="wzCpSetValidity('issue')">발급일 기준</div>
+        <div class="cp-toggle2-btn ${wz.cpValidity==='custom'?'sel':''}" onclick="wzCpSetValidity('custom')">특정 기간 직접 입력</div>
+      </div>
+      ${wz.cpValidity==='issue' ? `
+      <div class="cp-days-input">
+        <span>발급일 기준</span>
+        <input type="text" value="${escapeHtml(wz.cpValidityDays)}" oninput="wzCpOnValidityDays(this.value)"/>
+        <span>일 이내</span>
+      </div>` : ``}
+      ${wz.cpValidity==='custom' ? `<div class="cp-target-note">실습에서는 발급일 기준으로만 설정할 수 있어요.</div>` : ``}
+    </div>
+
+    <div class="cp-section">
+      <div class="cp-q">쿠폰은 총 몇 장 발행할까요? <span class="req">*필수</span></div>
+      <div class="cp-toggle2" style="margin-bottom:0;">
+        <div class="cp-toggle2-btn ${wz.cpQuantityLimit==='none'?'sel':''}" onclick="wzCpSetQuantityLimit('none')">제한 없이</div>
+        <div class="cp-toggle2-btn ${wz.cpQuantityLimit==='limited'?'sel':''}" onclick="wzCpSetQuantityLimit('limited')">수량 제한이 있어요</div>
+      </div>
+      ${wz.cpQuantityLimit==='limited' ? `
+      <div class="cp-days-input">
+        <span>총</span>
+        <input type="text" value="${escapeHtml(wz.cpQuantityCount)}" oninput="wzCpOnQuantityCount(this.value)"/>
+        <span>장 발행할게요</span>
+      </div>` : ``}
+
+      <div style="border-top:1px solid var(--line);margin:20px 0 16px;"></div>
+      <div class="cp-q" style="font-size:14.5px;">고객 1명(ID)당 쿠폰을 몇 장씩 줄까요?</div>
+      <div class="cp-radio-row" onclick="wzCpSetPerPerson('limited')">
+        <div class="cp-radio ${wz.cpPerPerson==='limited'?'on':''}"></div>
+        <span>한 사람에게</span>
+        <input type="text" value="${escapeHtml(wz.cpPerPersonCount)}" oninput="wzCpOnPerPersonCount(this.value)" onclick="event.stopPropagation()"/>
+        <span>장 까지 발행 할게요</span>
+      </div>
+      <div class="cp-radio-row" onclick="wzCpSetPerPerson('unlimited')">
+        <div class="cp-radio ${wz.cpPerPerson==='unlimited'?'on':''}"></div>
+        <span>수량 제한이 없어요</span>
+      </div>
     </div>
 
     <div class="cp-btn-row">
@@ -1184,6 +1304,23 @@ function cpRenderForm(){
       <button class="cp-btn-submit" onclick="wzCpSubmit()">발행</button>
     </div>
   `;
+}
+
+function cpTargetLabel(t){
+  return t==='all' ? '모든 고객' : t==='notify' ? '혜택 알림받기한 고객' : t==='marketing' ? '마케팅메시지 수신 고객' : t==='npay' ? 'Npay 커넥트 리뷰작성 고객' : '';
+}
+function cpUsageLabel(u){
+  return u==='anywhere' ? '방문·N예약·N주문' : u==='booking' ? 'N예약' : '';
+}
+function cpValidityLabel(){
+  if(wz.cpValidity==='issue') return `발급일 기준 ${wz.cpValidityDays||0}일 이내`;
+  if(wz.cpValidity==='custom') return '특정 기간';
+  return '';
+}
+function cpQuantityLabel(){
+  if(wz.cpQuantityLimit==='none') return '제한 없음';
+  if(wz.cpQuantityLimit==='limited') return `총 ${wz.cpQuantityCount||0}장`;
+  return '';
 }
 
 function cpRenderPreview(){
@@ -1198,10 +1335,10 @@ function cpRenderPreview(){
       <div class="txt">${hasBasics ? cpBenefitText() : '쿠폰 혜택을 입력해 주세요.'}</div>
     </div>
     <div class="cp-preview-list">
-      <div class="cp-preview-row"><span class="k">대상 고객</span><span class="v ${wz.cpTarget?'set':''}">${wz.cpTarget ? (wz.cpTarget==='all'?'모든 고객':'혜택 알림받기한 고객') : '선택해 주세요.'}</span></div>
-      <div class="cp-preview-row"><span class="k">사용 장소</span><span class="v">선택해 주세요.</span></div>
-      <div class="cp-preview-row"><span class="k">유효 기간</span><span class="v">선택해 주세요.</span></div>
-      <div class="cp-preview-row"><span class="k">발행 수량</span><span class="v">선택해 주세요.</span></div>
+      <div class="cp-preview-row"><span class="k">대상 고객</span><span class="v ${wz.cpTarget?'set':''}">${wz.cpTarget ? cpTargetLabel(wz.cpTarget) : '선택해 주세요.'}</span></div>
+      <div class="cp-preview-row"><span class="k">사용 장소</span><span class="v ${wz.cpUsagePlace?'set':''}">${wz.cpUsagePlace ? cpUsageLabel(wz.cpUsagePlace) : '선택해 주세요.'}</span></div>
+      <div class="cp-preview-row"><span class="k">유효 기간</span><span class="v ${wz.cpValidity?'set':''}">${wz.cpValidity ? cpValidityLabel() : '선택해 주세요.'}</span></div>
+      <div class="cp-preview-row"><span class="k">발행 수량</span><span class="v ${wz.cpQuantityLimit?'set':''}">${wz.cpQuantityLimit ? cpQuantityLabel() : '선택해 주세요.'}</span></div>
       <div class="cp-preview-row"><span class="k">사용 조건</span><span class="v set">단독 사용 불가</span></div>
     </div>
   `;
@@ -1218,11 +1355,28 @@ function wzCpOnAmount(v){ wz.cpAmount = v.replace(/[^0-9]/g,''); cpRenderPreview
 function wzCpToggleMaxCap(){ wz.cpMaxCap = !wz.cpMaxCap; wzCpRenderAll(); }
 function wzCpOnMaxAmount(v){ wz.cpMaxAmount = v.replace(/[^0-9]/g,''); cpRenderPreview(); }
 function wzCpSetTarget(t){ wz.cpTarget = t; wzCpRenderAll(); }
+function wzCpToggleExposureInfo(){ wz.cpExposureInfoOpen = !wz.cpExposureInfoOpen; cpRenderForm(); }
+function wzCpSetExposure(v){ wz.cpExposure = v; wzCpRenderAll(); }
+function wzCpToggleUsageInfo(){ wz.cpUsageInfoOpen = !wz.cpUsageInfoOpen; cpRenderForm(); }
+function wzCpSetUsagePlace(v){ wz.cpUsagePlace = v; wzCpRenderAll(); }
+function wzCpSetValidity(v){ wz.cpValidity = v; wzCpRenderAll(); }
+function wzCpOnValidityDays(v){ wz.cpValidityDays = v.replace(/[^0-9]/g,''); cpRenderPreview(); }
+function wzCpSetQuantityLimit(v){ wz.cpQuantityLimit = v; wzCpRenderAll(); }
+function wzCpOnQuantityCount(v){ wz.cpQuantityCount = v.replace(/[^0-9]/g,''); cpRenderPreview(); }
+function wzCpSetPerPerson(v){ wz.cpPerPerson = v; wzCpRenderAll(); }
+function wzCpOnPerPersonCount(v){ wz.cpPerPersonCount = v.replace(/[^0-9]/g,''); }
 function wzCpSubmit(){
   if(!wz.cpType || wz.cpType!=='discount'){ alert('할인 쿠폰을 선택해주세요.'); return; }
   if(!wz.cpAmount){ alert('쿠폰 혜택 금액을 입력해주세요.'); return; }
   if(!wz.cpTarget){ alert('쿠폰을 받을 대상을 선택해주세요.'); return; }
-  wz.coupons.push({ type: wz.cpType, mode: wz.cpMode, amount: wz.cpAmount, maxCap: wz.cpMaxCap, maxAmount: wz.cpMaxAmount, target: wz.cpTarget });
+  if(!wz.cpExposure){ alert('쿠폰 노출 기간을 선택해주세요.'); return; }
+  if(!wz.cpUsagePlace){ alert('쿠폰 사용 장소를 선택해주세요.'); return; }
+  if(!wz.cpValidity){ alert('쿠폰 유효 기간을 선택해주세요.'); return; }
+  if(!wz.cpQuantityLimit){ alert('쿠폰 발행 수량을 선택해주세요.'); return; }
+  wz.coupons.push({
+    type: wz.cpType, mode: wz.cpMode, amount: wz.cpAmount, maxCap: wz.cpMaxCap, maxAmount: wz.cpMaxAmount,
+    target: wz.cpTarget, usagePlace: wz.cpUsagePlace, validity: cpValidityLabel(), quantity: cpQuantityLabel(),
+  });
   goto('couponhome');
 }
 
@@ -1348,6 +1502,11 @@ let wz = {
   // 쿠폰
   coupons:[],
   cpType:null, cpMode:null, cpAmount:"", cpMaxCap:false, cpMaxAmount:"", cpTarget:null,
+  cpExposure:null, cpExposureInfoOpen:false,
+  cpUsagePlace:null, cpUsageInfoOpen:false,
+  cpValidity:null, cpValidityDays:"30", cpValidityStart:"", cpValidityEnd:"",
+  cpQuantityLimit:null, cpQuantityCount:"",
+  cpPerPerson:'limited', cpPerPersonCount:"1",
 };
 let wzFormTab = 'basic';
 function wzSetFormTab(t){
