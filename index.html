@@ -186,6 +186,7 @@
     display:flex;align-items:center;gap:10px;margin-bottom:2px;
   }
   .biz-nav-item .nav-ic{width:18px;flex-shrink:0;text-align:center;font-size:13px;}
+  .biz-nav-item .nav-badge{background:#fff;color:#1C1C1E;font-size:9px;font-weight:800;padding:1.5px 6px;border-radius:8px;margin-left:auto;}
   .biz-nav-item.active{background:none;color:#fff;font-weight:700;}
   .biz-nav-item.inquiry-toggle{border-top:1px solid #333;margin-top:10px;padding-top:16px;color:#B0B0B3;}
   .biz-nav-item.inquiry-toggle .chev{margin-left:auto;font-size:9px;color:#7a7a7c;}
@@ -216,6 +217,17 @@
   .sol-inuse-btn{width:100%;border:1px solid var(--line);background:#fff;border-radius:8px;padding:11px;
     text-align:center;font-size:13px;font-weight:700;color:var(--gray-700);cursor:pointer;}
   @media (max-width:700px){ .sol-card-grid, .sol-inuse-grid{grid-template-columns:1fr;} }
+  .book-card{display:flex;align-items:center;gap:24px;border:1px solid var(--line);border-radius:12px;
+    padding:24px;margin-bottom:20px;}
+  .book-card .icon{width:90px;height:90px;border-radius:12px;overflow:hidden;flex-shrink:0;background:var(--surface);}
+  .book-card .icon img{width:100%;height:100%;object-fit:cover;}
+  .book-card .body{flex:1;}
+  .book-card .t{font-size:19px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .book-card .sub{font-size:13px;color:var(--gray-500);margin-bottom:10px;}
+  .book-card .tag{display:inline-block;background:var(--green-tint);color:var(--green-deep);font-size:12px;
+    font-weight:700;padding:5px 12px;border-radius:16px;}
+  .book-card .cta{flex-shrink:0;background:#1C1C1E;color:#fff;border:none;border-radius:9px;
+    padding:14px 22px;font-size:14px;font-weight:700;cursor:pointer;}
   .biz-hero{
     position:relative;height:230px;background:linear-gradient(135deg,#cfd6da,#e7ebed);
     display:flex;flex-direction:column;justify-content:flex-end;padding:22px 28px;color:#fff;
@@ -617,6 +629,7 @@ function render(){
   else if(view === 'bizdetail') app.innerHTML = viewBizDetail();
   else if(view === 'wizard') { app.innerHTML = viewWizardShell(); initWizard(); }
   else if(view === 'solutions') { app.innerHTML = viewSolutions(); initSolutions(); }
+  else if(view === 'booking') { app.innerHTML = viewBooking(); }
 }
 
 /* ============================================================
@@ -755,13 +768,15 @@ function viewNewBiz(){
 }
 function showNbToast(){ document.getElementById('nbToast').classList.add('show'); }
 
-const NAV_ITEMS = ["업체정보","스마트콜","마케팅","리뷰","고객","통계","비즈니스 스쿨","금융지원","솔루션"];
-const NAV_ICONS = {"업체정보":"ℹ️","스마트콜":"📞","마케팅":"🗂️","리뷰":"✏️","고객":"👥","통계":"📊","비즈니스 스쿨":"🪜","금융지원":"🏦","솔루션":"⚙️"};
+const NAV_ITEMS = ["업체정보","예약·주문","스마트콜","마케팅","리뷰","고객","통계","비즈니스 스쿨","금융지원","솔루션"];
+const NAV_ICONS = {"업체정보":"ℹ️","예약·주문":"🗓️","스마트콜":"📞","마케팅":"🗂️","리뷰":"✏️","고객":"👥","통계":"📊","비즈니스 스쿨":"🪜","금융지원":"🏦","솔루션":"⚙️"};
 const NAV_LINKS = {"비즈니스 스쿨":"https://bizschool.naver.com/online/courses/4"};
+const NAV_BADGES = {"솔루션":"NEW"};
 let inquiryOpen = false;
 function wzSidebarClick(i){
   const name = NAV_ITEMS[i];
   if(name==='업체정보') goto('bizdetail');
+  else if(name==='예약·주문') goto('booking');
   else if(name==='솔루션') goto('solutions');
   else if(NAV_LINKS[name]) window.open(NAV_LINKS[name], '_blank');
   else alert('실습에서는 지원하지 않아요');
@@ -771,7 +786,7 @@ function sidebarNav(activeIndex){
   return `
   <div class="biz-sidebar">
     <div class="biz-head"><span class="thumb"></span>${escapeHtml(userName)} ›</div>
-    ${NAV_ITEMS.map((n,i)=>`<div class="biz-nav-item ${i===activeIndex?'active':''}" onclick="wzSidebarClick(${i})"><span class="nav-ic">${NAV_ICONS[n]||''}</span>${n}</div>`).join("")}
+    ${NAV_ITEMS.map((n,i)=>`<div class="biz-nav-item ${i===activeIndex?'active':''}" onclick="wzSidebarClick(${i})"><span class="nav-ic">${NAV_ICONS[n]||''}</span>${n}${NAV_BADGES[n] ? `<span class="nav-badge">${NAV_BADGES[n]}</span>` : ``}</div>`).join("")}
     <div class="biz-nav-item inquiry-toggle" onclick="toggleInquiry()">
       <span class="nav-ic">💬</span>문의 채널 <span class="chev">${inquiryOpen?'▲':'▼'}</span>
     </div>
@@ -878,6 +893,34 @@ const SOL_FIND = [
     {icon:SOL_ICONS.localad, title:"우리 지역 소상공인 광고하기", sub:"지역소상공인광고"},
   ]},
 ];
+
+function viewBooking(){
+  const cards = [
+    { icon: SOL_ICONS.booking, t: "온라인으로 예약 받기", sub: "네이버 예약", cta: "예약 시작하기" },
+    { icon: SOL_ICONS.npay, t: "온라인으로 주문 받기", sub: "네이버 주문", cta: "주문 시작하기" },
+    { icon: SOL_ICONS.program, t: "프로그램 운영하기", sub: "네이버 프로그램", cta: "프로그램 시작하기" },
+  ];
+  return `
+  ${topNav()}
+  <div class="biz-layout">
+    ${sidebarNav(NAV_ITEMS.indexOf('예약·주문'))}
+    <div class="biz-main" style="padding:26px 28px 60px;">
+      <div style="font-size:24px;font-weight:800;color:var(--ink);line-height:1.5;margin-bottom:26px;">
+        매장 운영을 더 원활하게!<br/>네이버 <span style="color:var(--green-deep);">예약·주문</span>을 사용해보세요.
+      </div>
+      ${cards.map(c => `
+        <div class="book-card">
+          <div class="icon"><img src="${c.icon}"/></div>
+          <div class="body">
+            <div class="t">${c.t}</div>
+            <div class="sub">${c.sub}</div>
+            <div class="tag">자세히</div>
+          </div>
+          <button class="cta" onclick="alert('실습에서는 지원하지 않아요')">${c.cta} ›</button>
+        </div>`).join("")}
+    </div>
+  </div>`;
+}
 
 function viewSolutions(){
   return `
