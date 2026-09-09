@@ -767,6 +767,40 @@
   .stp-tip-bubble{background:var(--ink);color:#fff;font-size:11.5px;padding:8px 16px;border-radius:20px;display:inline-block;}
   .stp-placeholder{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:90px 20px;
     text-align:center;color:var(--gray-500);font-size:14px;line-height:1.8;}
+
+  /* --- 플레이스 탭 --- */
+  .stp-place-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+  .stp-col{display:flex;flex-direction:column;gap:16px;}
+  .stp-panel-title{font-size:16px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:6px;margin-bottom:16px;}
+  .stp-panel-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .stp-qicon{width:15px;height:15px;border-radius:50%;border:1px solid var(--gray-300);color:var(--gray-300);
+    font-size:10px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .stp-big-num{font-size:32px;font-weight:800;color:var(--ink);margin-bottom:18px;}
+  .stp-big-num span{font-size:15px;font-weight:700;margin-left:2px;}
+  .stp-toggle-group{display:flex;background:var(--surface);border-radius:20px;padding:3px;gap:2px;}
+  .stp-toggle-btn{padding:7px 14px;border-radius:18px;font-size:12.5px;font-weight:700;color:var(--gray-500);cursor:pointer;}
+  .stp-toggle-btn.active{background:var(--ink);color:#fff;}
+  .stp-rank-row{display:flex;align-items:center;padding:14px 12px;border-radius:8px;font-size:14px;}
+  .stp-rank-row.top{background:var(--green-tint);margin-bottom:2px;}
+  .stp-rank-row .rank{width:22px;font-weight:800;color:var(--gray-500);}
+  .stp-rank-row.top .rank{color:var(--green-deep);}
+  .stp-rank-row .name{flex:1;font-weight:700;color:var(--ink);}
+  .stp-rank-row .val{font-weight:800;color:var(--ink);}
+  .stp-rank-row.top .val{color:var(--green-deep);}
+  .stp-rank-divider{border-bottom:1px solid var(--line);}
+  .stp-gender-gauge{margin-bottom:14px;}
+  .stp-age-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:11.5px;}
+  .stp-age-pct-l{width:32px;text-align:right;color:var(--gray-700);font-weight:700;flex-shrink:0;}
+  .stp-age-pct-r{width:32px;text-align:left;color:var(--gray-700);font-weight:700;flex-shrink:0;}
+  .stp-age-bar-l{flex:1;height:7px;background:var(--surface);border-radius:4px;overflow:hidden;
+    display:flex;justify-content:flex-end;}
+  .stp-age-bar-l .fill{height:100%;background:#3B82F6;border-radius:4px;}
+  .stp-age-bar-r{flex:1;height:7px;background:var(--surface);border-radius:4px;overflow:hidden;}
+  .stp-age-bar-r .fill{height:100%;background:#FF5A87;border-radius:4px;}
+  .stp-age-label{width:34px;text-align:center;color:var(--gray-500);font-size:11.5px;flex-shrink:0;}
+  @media (max-width:900px){
+    .stp-place-grid{grid-template-columns:1fr;}
+  }
   @media (max-width:900px){
     .stp-metric-row{grid-template-columns:1fr;}
     .stp-metric{border-left:none;border-top:1px solid var(--line);}
@@ -1124,6 +1158,8 @@ const STAT_TABS = [
 ];
 let statTab = 'report';
 let statInflowTab = 'channel';
+let statTimeTab = 'hour';
+function wzSetTimeTab(t){ statTimeTab = t; render(); }
 function wzSetStatTab(t){ statTab = t; render(); }
 function wzSetInflowTab(t){ statInflowTab = t; render(); }
 
@@ -1136,7 +1172,7 @@ function viewStatistics(){
       <div class="stp-tabs">
         ${STAT_TABS.map(t=>`<div class="stp-tab ${statTab===t.id?'active':''}" onclick="wzSetStatTab('${t.id}')">${t.label}</div>`).join("")}
       </div>
-      ${statTab==='report' ? wzStatReportContent() : wzStatPlaceholder(STAT_TABS.find(t=>t.id===statTab).label)}
+      ${statTab==='report' ? wzStatReportContent() : statTab==='place' ? wzStatPlaceContent() : wzStatPlaceholder(STAT_TABS.find(t=>t.id===statTab).label)}
     </div>
   </div>`;
 }
@@ -1256,6 +1292,149 @@ function wzStatReportContent(){
         ${wzStatInflowList()}
         <div class="stp-more-btn" onclick="alert('실습에서는 여기까지만 제공돼요.')">유입 더보기 ›</div>
         <div class="stp-tip-wrap"><span class="stp-tip-bubble">우리 가게를 검색한 고객이 궁금하다면?</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function wzStatBarChart(labels, values, color, maxY){
+  maxY = maxY || 40;
+  const W=520, H=170, padL=26, padR=8, padT=8, padB=24;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const n=labels.length;
+  const slot=plotW/n, bw=slot*0.42;
+  let grid='';
+  [0,10,20,30,40].forEach(v=>{
+    const y=padT+plotH-(v/maxY*plotH);
+    grid+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#E5E8EB" stroke-width="1"/><text x="2" y="${(y+4).toFixed(1)}" font-size="10" fill="#B0B8C1">${v}</text>`;
+  });
+  let bars='', xlabels='';
+  labels.forEach((lab,i)=>{
+    const cx = padL + slot*i + slot/2;
+    const v = values[i]||0;
+    const barH = (v/maxY)*plotH;
+    const y = padT+plotH-barH;
+    if(v>0) bars+=`<rect x="${(cx-bw/2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${barH.toFixed(1)}" rx="3" fill="${color}"/>`;
+    xlabels+=`<text x="${cx.toFixed(1)}" y="${H-6}" font-size="11" fill="#6B7684" text-anchor="middle">${escapeHtml(lab)}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:150px;display:block;">${grid}${bars}${xlabels}</svg>`;
+}
+
+function wzLineChart(labels, values, color, maxY){
+  maxY = maxY || Math.max.apply(null, values.concat([10]));
+  const n = labels.length;
+  const W=520, H=170, padL=26, padR=8, padT=8, padB=24;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  function xy(i,v){ const x = padL + (n===1?0:(plotW/(n-1))*i); const y = padT+plotH-(v/maxY*plotH); return [x,y]; }
+  let grid='';
+  const steps=4;
+  for(let s=0;s<=steps;s++){
+    const v = Math.round(maxY/steps*s);
+    const y = padT+plotH-(v/maxY*plotH);
+    grid+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#E5E8EB" stroke-width="1"/><text x="2" y="${(y+4).toFixed(1)}" font-size="10" fill="#B0B8C1">${v}</text>`;
+  }
+  let xlabels='';
+  labels.forEach((lab,i)=>{ const p=xy(i,0); xlabels+=`<text x="${p[0].toFixed(1)}" y="${H-6}" font-size="11" fill="#6B7684" text-anchor="middle">${escapeHtml(lab)}</text>`; });
+  const pts = values.map((v,i)=>xy(i,v));
+  const pathD = pts.map((p,i)=>(i===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:150px;display:block;">${grid}<path d="${pathD}" fill="none" stroke="${color}" stroke-width="2.5"/>${xlabels}</svg>`;
+}
+
+function wzRankList(items){
+  return items.map((it,i)=>{
+    const row = `<div class="stp-rank-row ${it.top?'top':''}"><span class="rank">${i+1}</span><span class="name">${escapeHtml(it.n)}</span><span class="val">${it.v}</span></div>`;
+    const divider = (i<items.length-1) ? `<div class="stp-rank-divider"></div>` : ``;
+    return row + divider;
+  }).join("");
+}
+
+function wzGenderGaugeSvg(malePct, femalePct){
+  const cx=110, cy=110, r=78, sw=22;
+  function pt(ang){ const rad=ang*Math.PI/180; return [cx+r*Math.cos(rad), cy-r*Math.sin(rad)]; }
+  const splitAngle = 180 - 180*(malePct/100);
+  const p1=pt(180), p2=pt(splitAngle), p3=pt(0);
+  const maleD = `M ${p1[0].toFixed(1)} ${p1[1].toFixed(1)} A ${r} ${r} 0 0 1 ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+  const femaleD = `M ${p2[0].toFixed(1)} ${p2[1].toFixed(1)} A ${r} ${r} 0 0 1 ${p3[0].toFixed(1)} ${p3[1].toFixed(1)}`;
+  return `<svg viewBox="0 0 220 120" style="width:100%;max-width:280px;display:block;margin:0 auto;">
+    <path d="${maleD}" fill="none" stroke="#3B82F6" stroke-width="${sw}"/>
+    <path d="${femaleD}" fill="none" stroke="#FF5A87" stroke-width="${sw}"/>
+    <text x="12" y="72" font-size="22" font-weight="800" fill="#191919">${malePct}<tspan font-size="12" font-weight="700">%</tspan></text>
+    <text x="12" y="92" font-size="11" fill="#6B7684">● 남자</text>
+    <text x="208" y="72" font-size="22" font-weight="800" fill="#191919" text-anchor="end">${femalePct}<tspan font-size="12" font-weight="700">%</tspan></text>
+    <text x="208" y="92" font-size="11" fill="#6B7684" text-anchor="end">● 여자</text>
+  </svg>`;
+}
+
+function wzGenderAgeWidget(){
+  const malePct=60, femalePct=40;
+  const ages=[
+    {band:'10대', m:0,  f:0},
+    {band:'20대', m:57, f:11},
+    {band:'30대', m:25, f:11},
+    {band:'40대', m:14, f:68},
+    {band:'50대', m:4,  f:0},
+    {band:'60대', m:0,  f:11},
+    {band:'70대', m:0,  f:0},
+  ];
+  const rows = ages.map(a=>`
+    <div class="stp-age-row">
+      <span class="stp-age-pct-l">${a.m}%</span>
+      <div class="stp-age-bar-l"><div class="fill" style="width:${Math.max(a.m,2)}%;"></div></div>
+      <span class="stp-age-label">${a.band}</span>
+      <div class="stp-age-bar-r"><div class="fill" style="width:${Math.max(a.f,2)}%;"></div></div>
+      <span class="stp-age-pct-r">${a.f}%</span>
+    </div>`).join("");
+  return `<div class="stp-gender-gauge">${wzGenderGaugeSvg(malePct, femalePct)}</div>${rows}`;
+}
+
+function wzStatPlaceContent(){
+  const bizName = userName ? escapeHtml(userName) : "우리가게";
+  const inflowDates = ['9.2','3','4','5','6','7','8'];
+  const inflowValues = [0,0,0,0,0,32,22];
+  const hourLabels = ['0시','3시','6시','9시','12시','15시','18시','21시'];
+  const hourValues = [1,1,2,3,2,4,32,5];
+  const weekdayLabels = ['월','화','수','목','금','토','일'];
+  const weekdayValues = [5,8,0,0,0,0,0];
+  return `
+  <div class="stp-wrap">
+    <div class="stp-place-grid">
+      <div class="stp-col">
+        <div class="stp-panel">
+          <div class="stp-panel-title">유입 수 <span class="stp-qicon">?</span></div>
+          <div class="stp-big-num">51<span>회</span></div>
+          ${wzStatBarChart(inflowDates, inflowValues, '#03C75A')}
+          <div class="stp-chart-legend"><span><span class="dot" style="background:#03C75A;"></span>유입 수</span></div>
+        </div>
+        <div class="stp-panel">
+          <div class="stp-panel-title-row">
+            <div class="stp-panel-title" style="margin-bottom:0;">시간·요일별 <span class="stp-qicon">?</span></div>
+            <div class="stp-toggle-group">
+              <div class="stp-toggle-btn ${statTimeTab==='hour'?'active':''}" onclick="wzSetTimeTab('hour')">시간별</div>
+              <div class="stp-toggle-btn ${statTimeTab==='weekday'?'active':''}" onclick="wzSetTimeTab('weekday')">요일별</div>
+            </div>
+          </div>
+          ${statTimeTab==='hour' ? wzLineChart(hourLabels, hourValues, '#03C75A', 40) : wzLineChart(weekdayLabels, weekdayValues, '#03C75A', 40)}
+        </div>
+      </div>
+      <div class="stp-col">
+        <div class="stp-panel">
+          <div class="stp-panel-title">유입 채널 <span class="stp-qicon">?</span></div>
+          ${wzRankList([
+            {n:'네이버지도', v:'76.47%', top:true},
+            {n:'네이버검색', v:'19.61%'},
+            {n:'웹사이트', v:'3.92%'},
+          ])}
+        </div>
+        <div class="stp-panel">
+          <div class="stp-panel-title">유입 키워드 <span class="stp-qicon">?</span></div>
+          ${wzRankList([
+            {n:bizName, v:'100.00%', top:true},
+          ])}
+        </div>
+        <div class="stp-panel">
+          <div class="stp-panel-title">성별·연령 <span class="stp-qicon">?</span></div>
+          ${wzGenderAgeWidget()}
+        </div>
       </div>
     </div>
   </div>`;
