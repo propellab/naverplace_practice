@@ -192,6 +192,7 @@
   .biz-nav-item.inquiry-toggle .chev{margin-left:auto;font-size:9px;color:#7a7a7c;}
   .inquiry-sub{padding:2px 0 10px 32px;}
   .inquiry-item{padding:9px 6px;font-size:12.5px;color:#9a9a9c;cursor:pointer;}
+  .inquiry-item.sel{color:var(--green);font-weight:700;}
   .inquiry-item:hover{color:#fff;}
   .biz-sidebar-foot{margin-top:18px;padding-top:14px;border-top:1px solid #333;display:flex;gap:14px;font-size:11.5px;color:#7a7a7c;}
   .biz-main{padding:0 0 60px;min-width:0;}
@@ -228,6 +229,89 @@
     font-weight:700;padding:5px 12px;border-radius:16px;}
   .book-card .cta{flex-shrink:0;background:#1C1C1E;color:#fff;border:none;border-radius:9px;
     padding:14px 22px;font-size:14px;font-weight:700;cursor:pointer;}
+
+  /* ============= 쿠폰 (coupon) pages ============= */
+  .cp-tabs{display:flex;gap:28px;padding:18px 28px 0;border-bottom:1px solid var(--line);}
+  .cp-tab{padding-bottom:14px;font-size:16px;color:var(--gray-500);border-bottom:2px solid transparent;cursor:pointer;}
+  .cp-tab.active{color:var(--ink);font-weight:800;border-color:var(--ink);}
+  .cp-wrap{padding:28px;max-width:1080px;}
+  .cp-intro-card{display:flex;gap:36px;align-items:flex-start;margin-bottom:28px;}
+  .cp-icon-box{width:220px;height:220px;border-radius:16px;background:linear-gradient(135deg,#3FBF8F,#1E9C74);
+    flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;
+    position:relative;overflow:hidden;}
+  .cp-intro-title{font-size:30px;font-weight:800;color:var(--ink);margin-bottom:12px;}
+  .cp-intro-desc{font-size:15px;color:var(--gray-700);margin-bottom:22px;line-height:1.6;}
+  .cp-new-btn{display:inline-block;background:#1C1C1E;color:#fff;border:none;border-radius:9px;
+    padding:14px 22px;font-size:14.5px;font-weight:700;cursor:pointer;}
+  .cp-meta-row{display:flex;gap:60px;padding:22px 0;border-top:1px solid var(--line);margin-bottom:22px;}
+  .cp-meta-col h5{font-size:12.5px;color:var(--gray-500);font-weight:700;margin:0 0 8px;}
+  .cp-meta-col div{font-size:14.5px;color:var(--ink);font-weight:600;}
+  .cp-feature-title{font-size:20px;font-weight:800;color:var(--ink);margin-bottom:14px;}
+  .cp-feature-desc{font-size:13.5px;color:var(--gray-700);line-height:1.75;margin-bottom:24px;}
+  .cp-feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .cp-feature-box{background:var(--surface);border-radius:12px;padding:22px;}
+  .cp-feature-num{font-size:22px;font-weight:800;color:var(--green-deep);margin-bottom:10px;}
+  .cp-feature-box p{font-size:13.5px;color:var(--gray-700);line-height:1.6;margin:0;}
+  .cp-list-item{border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:14px;
+    display:flex;justify-content:space-between;align-items:center;}
+  .cp-list-item .name{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:5px;}
+  .cp-list-item .sub{font-size:12.5px;color:var(--gray-500);}
+  .cp-list-item .del{border:1px solid var(--line);background:#fff;border-radius:7px;padding:8px 14px;font-size:12.5px;color:var(--gray-500);cursor:pointer;}
+  .cp-empty{text-align:center;padding:60px 0;color:var(--gray-300);font-size:14px;}
+
+  .cp-create-head{display:flex;align-items:center;gap:14px;margin-bottom:24px;}
+  .cp-back{font-size:20px;color:var(--gray-500);cursor:pointer;}
+  .cp-create-title{font-size:24px;font-weight:800;color:var(--ink);}
+  .cp-section{border:1px solid var(--line);border-radius:12px;padding:26px;margin-bottom:20px;}
+  .cp-q{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:18px;}
+  .cp-q .req{color:var(--alert);font-size:12px;margin-left:2px;}
+  .cp-type-row{display:flex;gap:14px;margin-bottom:16px;}
+  .cp-type-btn{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:20px;text-align:center;
+    font-size:15px;font-weight:700;color:var(--gray-700);cursor:pointer;display:flex;align-items:center;
+    justify-content:center;gap:10px;}
+  .cp-type-btn .ic{width:26px;height:26px;border-radius:50%;background:var(--surface);display:flex;
+    align-items:center;justify-content:center;font-size:13px;}
+  .cp-type-btn.sel{border-color:var(--green);color:var(--green-deep);background:var(--green-tint);}
+  .cp-mode-row{display:flex;gap:10px;align-items:center;margin-bottom:8px;}
+  .cp-mode-btn{border:1.5px solid var(--line);border-radius:8px;padding:12px 20px;font-size:14px;font-weight:700;
+    color:var(--gray-500);cursor:pointer;}
+  .cp-mode-btn.sel{border-color:var(--ink);color:var(--ink);border-width:2px;}
+  .cp-amount-box{flex:1;position:relative;}
+  .cp-amount-box input{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;font-size:14.5px;}
+  .cp-amount-box input.invalid{border-color:var(--alert);background:var(--alert-tint);}
+  .cp-unit{font-size:14px;color:var(--gray-700);white-space:nowrap;}
+  .cp-required-note{color:var(--alert);font-size:12px;margin-top:6px;}
+  .cp-maxcap-row{display:flex;align-items:center;gap:10px;margin-top:14px;}
+  .cp-checkbox{width:20px;height:20px;border:1.5px solid var(--line);border-radius:5px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0;}
+  .cp-checkbox.on{background:var(--green);border-color:var(--green);}
+  .cp-target-row{display:flex;gap:14px;flex-wrap:wrap;}
+  .cp-target-btn{flex:1;min-width:220px;border:1.5px solid var(--line);border-radius:10px;padding:16px;
+    text-align:center;font-size:14.5px;font-weight:700;color:var(--gray-700);cursor:pointer;}
+  .cp-target-btn.sel{border-color:var(--green);color:var(--green-deep);background:var(--green-tint);}
+  .cp-target-btn.disabled{color:var(--gray-300);cursor:default;background:var(--surface);}
+  .cp-target-note{font-size:12px;color:var(--gray-500);margin-top:12px;line-height:1.7;}
+  .cp-target-note a{color:var(--green-deep);}
+  .cp-btn-row{display:flex;gap:10px;margin-top:6px;}
+  .cp-btn-cancel{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:15px;
+    font-size:15px;font-weight:700;color:var(--gray-700);cursor:pointer;}
+  .cp-btn-submit{flex:1;border:none;background:var(--green);border-radius:10px;padding:15px;
+    font-size:15px;font-weight:700;color:#fff;cursor:pointer;}
+
+  .cp-preview{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:sticky;top:24px;}
+  .cp-preview-label{font-size:14px;font-weight:800;color:var(--ink);padding:18px 20px 0;}
+  .cp-preview-top{margin:16px 20px;border-radius:10px;padding:16px 18px;background:var(--surface);
+    color:var(--gray-500);font-size:13px;line-height:1.7;transition:background .2s,color .2s;}
+  .cp-preview-top.filled{background:var(--green);color:#fff;}
+  .cp-preview-benefit{display:flex;align-items:center;gap:12px;margin:0 20px 14px;}
+  .cp-preview-benefit .ic{width:36px;height:36px;border-radius:50%;background:var(--green-tint);
+    display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--green-deep);flex-shrink:0;}
+  .cp-preview-benefit .txt{font-size:14px;font-weight:700;color:var(--ink);}
+  .cp-preview-list{border-top:1px dashed var(--line);margin:0 20px;padding:10px 0 18px;}
+  .cp-preview-row{display:flex;justify-content:space-between;padding:8px 0;font-size:13px;}
+  .cp-preview-row .k{color:var(--gray-700);font-weight:600;}
+  .cp-preview-row .v{color:var(--gray-500);}
+  .cp-preview-row .v.set{color:var(--green-deep);font-weight:700;}
   .biz-hero{
     position:relative;height:230px;background:linear-gradient(135deg,#cfd6da,#e7ebed);
     display:flex;flex-direction:column;justify-content:flex-end;padding:22px 28px;color:#fff;
@@ -630,6 +714,8 @@ function render(){
   else if(view === 'wizard') { app.innerHTML = viewWizardShell(); initWizard(); }
   else if(view === 'solutions') { app.innerHTML = viewSolutions(); initSolutions(); }
   else if(view === 'booking') { app.innerHTML = viewBooking(); }
+  else if(view === 'couponhome') { app.innerHTML = viewCouponHome(); }
+  else if(view === 'couponcreate') { app.innerHTML = viewCouponCreate(); initCouponCreate(); }
 }
 
 /* ============================================================
@@ -772,21 +858,36 @@ const NAV_ITEMS = ["업체정보","예약·주문","스마트콜","마케팅","�
 const NAV_ICONS = {"업체정보":"ℹ️","예약·주문":"🗓️","스마트콜":"📞","마케팅":"🗂️","리뷰":"✏️","고객":"👥","통계":"📊","비즈니스 스쿨":"🪜","금융지원":"🏦","솔루션":"⚙️"};
 const NAV_LINKS = {"비즈니스 스쿨":"https://bizschool.naver.com/online/courses/4"};
 const NAV_BADGES = {"솔루션":"NEW"};
+const MARKETING_SUB = ["쿠폰","마케팅메시지","플레이스광고","지역소상공인광고","옥외광고"];
 let inquiryOpen = false;
+let marketingOpen = false;
 function wzSidebarClick(i){
   const name = NAV_ITEMS[i];
   if(name==='업체정보') goto('bizdetail');
   else if(name==='예약·주문') goto('booking');
+  else if(name==='마케팅'){ marketingOpen = !marketingOpen; render(); }
   else if(name==='솔루션') goto('solutions');
   else if(NAV_LINKS[name]) window.open(NAV_LINKS[name], '_blank');
   else alert('실습에서는 지원하지 않아요');
 }
+function wzMarketingSubClick(sub){
+  if(sub==='쿠폰') goto('couponhome');
+  else alert('실습에서는 지원하지 않아요');
+}
 function toggleInquiry(){ inquiryOpen = !inquiryOpen; render(); }
 function sidebarNav(activeIndex){
+  const onCoupon = (view==='couponhome' || view==='couponcreate');
+  const mktExpanded = marketingOpen || onCoupon;
   return `
   <div class="biz-sidebar">
     <div class="biz-head"><span class="thumb"></span>${escapeHtml(userName)} ›</div>
-    ${NAV_ITEMS.map((n,i)=>`<div class="biz-nav-item ${i===activeIndex?'active':''}" onclick="wzSidebarClick(${i})"><span class="nav-ic">${NAV_ICONS[n]||''}</span>${n}${NAV_BADGES[n] ? `<span class="nav-badge">${NAV_BADGES[n]}</span>` : ``}</div>`).join("")}
+    ${NAV_ITEMS.map((n,i)=>{
+      if(n==='마케팅'){
+        return `<div class="biz-nav-item ${mktExpanded?'active':''}" onclick="wzSidebarClick(${i})"><span class="nav-ic">${NAV_ICONS[n]}</span>${n}</div>
+        ${mktExpanded ? `<div class="inquiry-sub">${MARKETING_SUB.map(sub=>`<div class="inquiry-item ${sub==='쿠폰'&&onCoupon?'sel':''}" onclick="wzMarketingSubClick('${sub}')">${sub}</div>`).join("")}</div>` : ``}`;
+      }
+      return `<div class="biz-nav-item ${i===activeIndex?'active':''}" onclick="wzSidebarClick(${i})"><span class="nav-ic">${NAV_ICONS[n]||''}</span>${n}${NAV_BADGES[n] ? `<span class="nav-badge">${NAV_BADGES[n]}</span>` : ``}</div>`;
+    }).join("")}
     <div class="biz-nav-item inquiry-toggle" onclick="toggleInquiry()">
       <span class="nav-ic">💬</span>문의 채널 <span class="chev">${inquiryOpen?'▲':'▼'}</span>
     </div>
@@ -922,6 +1023,209 @@ function viewBooking(){
   </div>`;
 }
 
+/* ============================================================
+   COUPON — 쿠폰함 / 신규 쿠폰 만들기
+============================================================ */
+let cpHomeTab = 'list';
+function wzSetCpHomeTab(t){ cpHomeTab = t; render(); }
+
+function viewCouponHome(){
+  return `
+  ${topNav()}
+  <div class="biz-layout">
+    ${sidebarNav(-1)}
+    <div class="biz-main">
+      <div class="cp-tabs">
+        <div class="cp-tab ${cpHomeTab==='list'?'active':''}" onclick="wzSetCpHomeTab('list')">쿠폰함</div>
+        <div class="cp-tab ${cpHomeTab==='manage'?'active':''}" onclick="wzSetCpHomeTab('manage')">발급쿠폰관리</div>
+      </div>
+      <div class="cp-wrap">
+        ${cpHomeTab==='list' ? cpRenderIntro() : cpRenderManage()}
+      </div>
+    </div>
+  </div>`;
+}
+
+function cpRenderIntro(){
+  return `
+    <div class="cp-intro-card">
+      <div class="cp-icon-box">
+        <div style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.25);border-radius:6px;padding:3px 8px;font-size:10px;">무료증정</div>
+        <div style="text-align:center;">
+          <div style="font-size:34px;">🎟️</div>
+          <div style="margin-top:10px;">COUPON</div>
+        </div>
+      </div>
+      <div>
+        <div class="cp-intro-title">플레이스 쿠폰</div>
+        <div class="cp-intro-desc">우리 업체만의 쿠폰을 만들어 고객에게 발행할 수 있는 무료 마케팅솔루션입니다.</div>
+        <button class="cp-new-btn" onclick="goto('couponcreate')">신규 쿠폰 만들기 ›</button>
+      </div>
+    </div>
+
+    <div class="cp-meta-row">
+      <div class="cp-meta-col"><h5>제작사</h5><div>네이버</div></div>
+      <div class="cp-meta-col"><h5>카테고리</h5><div>마케팅</div></div>
+      <div class="cp-meta-col"><h5>추천업종</h5><div>음식점, 헤어샵, 네일샵, 숙박 등</div></div>
+    </div>
+
+    <div class="cp-feature-title">주요특징</div>
+    <div class="cp-feature-desc">
+      신규 고객 확보, 단골 고객 케어 등 업체 홍보 전략에 따른 맞춤형 쿠폰을 만들어 발행할 수 있습니다.<br/>
+      쿠폰 종류를 결제 금액 할인 쿠폰이나 무료 증정 쿠폰 중에 선택할 수 있고, 쿠폰 사용 장소를 매장·예약·주문으로
+      다르게 반영할 수 있으며, 쿠폰 발급 대상도 모든 고객, 혜택알림받기한 고객, 마케팅메시지 전송 대상 고객으로
+      설정할 수 있습니다. 발행한 쿠폰은 우리 업체 홈 뿐만 아니라 검색 결과 등 네이버 서비스의 다양한 영역에 노출됩니다.
+    </div>
+    <div class="cp-feature-grid">
+      <div class="cp-feature-box"><div class="cp-feature-num">01</div><p>쿠폰 종류, 사용 장소, 발급 대상을 자유롭게 설정할 수 있어요.</p></div>
+      <div class="cp-feature-box"><div class="cp-feature-num">02</div><p>우리 업체 홈, 검색 결과 등 네이버 서비스의 다양한 영역에 노출돼요.</p></div>
+    </div>
+
+    ${wz.coupons.length ? `
+    <div style="margin-top:32px;">
+      <div class="cp-feature-title">발행된 쿠폰</div>
+      ${wz.coupons.map((c,i)=>cpRenderListItem(c,i)).join("")}
+    </div>` : ``}
+  `;
+}
+
+function cpRenderManage(){
+  if(!wz.coupons.length) return `<div class="cp-empty">아직 발급된 쿠폰이 없습니다.<br/>쿠폰함 탭에서 새 쿠폰을 만들어보세요.</div>`;
+  return wz.coupons.map((c,i)=>cpRenderListItem(c,i)).join("");
+}
+
+function cpRenderListItem(c, i){
+  const benefit = c.mode==='percent'
+    ? `${c.amount||0}% 할인${c.maxCap && c.maxAmount ? ` (최대 ${formatWon(c.maxAmount)})` : ''}`
+    : `${formatWon(c.amount)} 할인`;
+  const targetLabel = c.target==='all' ? '모든 고객' : c.target==='notify' ? '혜택 알림받기한 고객' : '대상 미설정';
+  return `
+    <div class="cp-list-item">
+      <div>
+        <div class="name">${benefit}</div>
+        <div class="sub">${targetLabel} 대상 · 단독 사용 불가</div>
+      </div>
+      <div class="del" onclick="wzDeleteCoupon(${i})">삭제</div>
+    </div>`;
+}
+function wzDeleteCoupon(i){ wz.coupons.splice(i,1); render(); }
+
+function initCouponCreate(){
+  wz.cpType = null; wz.cpMode = null; wz.cpAmount = ""; wz.cpMaxCap = false; wz.cpMaxAmount = ""; wz.cpTarget = null;
+  cpRenderForm();
+  cpRenderPreview();
+}
+
+function viewCouponCreate(){
+  return `
+  ${topNav()}
+  <div class="biz-layout">
+    ${sidebarNav(-1)}
+    <div class="biz-main">
+      <div class="cp-wrap" style="max-width:1240px;">
+        <div class="cp-create-head">
+          <span class="cp-back" onclick="goto('couponhome')">←</span>
+          <span class="cp-create-title">신규 쿠폰 만들기</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start;">
+          <div id="cpFormArea"></div>
+          <div>
+            <div class="cp-preview-label">쿠폰 미리보기</div>
+            <div class="cp-preview" id="cpPreviewArea"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function cpRenderForm(){
+  const el = document.getElementById('cpFormArea'); if(!el) return;
+  el.innerHTML = `
+    <div class="cp-section">
+      <div class="cp-q">어떤 쿠폰을 발급할까요? <span class="req">*필수</span></div>
+      <div class="cp-type-row">
+        <div class="cp-type-btn ${wz.cpType==='discount'?'sel':''}" onclick="wzCpSetType('discount')"><span class="ic">%</span>할인 쿠폰</div>
+        <div class="cp-type-btn ${wz.cpType==='gift'?'sel':''}" onclick="wzCpSetType('gift')"><span class="ic">🎁</span>증정 쿠폰</div>
+      </div>
+      ${wz.cpType==='discount' ? `
+        <div class="cp-mode-row">
+          <div class="cp-mode-btn ${wz.cpMode==='fixed'?'sel':''}" onclick="wzCpSetMode('fixed')">정액</div>
+          <div class="cp-mode-btn ${wz.cpMode==='percent'?'sel':''}" onclick="wzCpSetMode('percent')">정률</div>
+          <div class="cp-amount-box">
+            <input type="text" id="cp-amount" value="${escapeHtml(wz.cpAmount)}" placeholder="" oninput="wzCpOnAmount(this.value)"/>
+          </div>
+          <span class="cp-unit">${wz.cpMode==='percent' ? '% 할인' : '원 할인'}</span>
+          ${wz.cpMode==='percent' ? `
+          <div class="cp-checkbox ${wz.cpMaxCap?'on':''}" onclick="wzCpToggleMaxCap()">${wz.cpMaxCap?'✓':''}</div>
+          <span class="cp-unit">최대</span>
+          <div class="cp-amount-box" style="max-width:140px;">
+            <input type="text" ${wz.cpMaxCap?'':'disabled'} value="${escapeHtml(wz.cpMaxAmount)}" placeholder="" oninput="wzCpOnMaxAmount(this.value)" style="${wz.cpMaxCap?'':'background:var(--surface);color:var(--gray-300);'}"/>
+          </div>
+          <span class="cp-unit">원까지 할인</span>` : ``}
+        </div>
+        ${!wz.cpAmount ? `<div class="cp-required-note">필수 입력</div>` : ``}
+      ` : ``}
+      ${wz.cpType==='gift' ? `<div class="cp-target-note">실습에서는 할인 쿠폰만 지원해요. 할인 쿠폰을 선택해보세요.</div>` : ``}
+    </div>
+
+    <div class="cp-section">
+      <div class="cp-q">누구에게 쿠폰을 제공하시겠어요? <span class="req">*필수</span></div>
+      <div class="cp-target-row">
+        <div class="cp-target-btn ${wz.cpTarget==='all'?'sel':''}" onclick="wzCpSetTarget('all')">모든 고객에게 제공</div>
+        <div class="cp-target-btn ${wz.cpTarget==='notify'?'sel':''}" onclick="wzCpSetTarget('notify')">혜택 알림받기한 고객에게 제공</div>
+        <div class="cp-target-btn disabled">마케팅메시지 수신 고객에게 제공</div>
+      </div>
+      <div class="cp-target-note">* 톡톡 파트너센터 계정 등록 후 마케팅메시지 수신고객 대상 쿠폰을 만들 수 있습니다. <a href="#" onclick="return false;">자세히 보기 ›</a></div>
+    </div>
+
+    <div class="cp-btn-row">
+      <button class="cp-btn-cancel" onclick="goto('couponhome')">취소</button>
+      <button class="cp-btn-submit" onclick="wzCpSubmit()">발행</button>
+    </div>
+  `;
+}
+
+function cpRenderPreview(){
+  const el = document.getElementById('cpPreviewArea'); if(!el) return;
+  const hasBasics = wz.cpType && (wz.cpType==='gift' || wz.cpAmount);
+  el.innerHTML = `
+    <div class="cp-preview-top ${wz.cpType ? 'filled' : ''}">
+      쿠폰 이름을 입력해 주세요.<br/>쿠폰 노출 기간을 설정해 주세요.
+    </div>
+    <div class="cp-preview-benefit">
+      <div class="ic">${wz.cpType==='gift' ? '🎁' : '%'}</div>
+      <div class="txt">${hasBasics ? cpBenefitText() : '쿠폰 혜택을 입력해 주세요.'}</div>
+    </div>
+    <div class="cp-preview-list">
+      <div class="cp-preview-row"><span class="k">대상 고객</span><span class="v ${wz.cpTarget?'set':''}">${wz.cpTarget ? (wz.cpTarget==='all'?'모든 고객':'혜택 알림받기한 고객') : '선택해 주세요.'}</span></div>
+      <div class="cp-preview-row"><span class="k">사용 장소</span><span class="v">선택해 주세요.</span></div>
+      <div class="cp-preview-row"><span class="k">유효 기간</span><span class="v">선택해 주세요.</span></div>
+      <div class="cp-preview-row"><span class="k">발행 수량</span><span class="v">선택해 주세요.</span></div>
+      <div class="cp-preview-row"><span class="k">사용 조건</span><span class="v set">단독 사용 불가</span></div>
+    </div>
+  `;
+}
+function cpBenefitText(){
+  if(wz.cpMode==='percent') return `${wz.cpAmount}% 할인${wz.cpMaxCap && wz.cpMaxAmount ? ` (최대 ${formatWon(wz.cpMaxAmount)})` : ''}`;
+  return `${formatWon(wz.cpAmount)} 할인`;
+}
+
+function wzCpRenderAll(){ cpRenderForm(); cpRenderPreview(); }
+function wzCpSetType(t){ wz.cpType = t; if(t==='discount' && !wz.cpMode) wz.cpMode = 'fixed'; wzCpRenderAll(); }
+function wzCpSetMode(m){ wz.cpMode = m; wz.cpAmount=""; wz.cpMaxCap=false; wz.cpMaxAmount=""; wzCpRenderAll(); }
+function wzCpOnAmount(v){ wz.cpAmount = v.replace(/[^0-9]/g,''); cpRenderPreview(); const el=document.getElementById('cp-amount'); if(el) el.value = wz.cpAmount; const note = document.querySelector('.cp-required-note'); if(note) note.style.display = wz.cpAmount ? 'none' : 'block'; }
+function wzCpToggleMaxCap(){ wz.cpMaxCap = !wz.cpMaxCap; wzCpRenderAll(); }
+function wzCpOnMaxAmount(v){ wz.cpMaxAmount = v.replace(/[^0-9]/g,''); cpRenderPreview(); }
+function wzCpSetTarget(t){ wz.cpTarget = t; wzCpRenderAll(); }
+function wzCpSubmit(){
+  if(!wz.cpType || wz.cpType!=='discount'){ alert('할인 쿠폰을 선택해주세요.'); return; }
+  if(!wz.cpAmount){ alert('쿠폰 혜택 금액을 입력해주세요.'); return; }
+  if(!wz.cpTarget){ alert('쿠폰을 받을 대상을 선택해주세요.'); return; }
+  wz.coupons.push({ type: wz.cpType, mode: wz.cpMode, amount: wz.cpAmount, maxCap: wz.cpMaxCap, maxAmount: wz.cpMaxAmount, target: wz.cpTarget });
+  goto('couponhome');
+}
+
 function viewSolutions(){
   return `
   ${topNav()}
@@ -1041,6 +1345,9 @@ let wz = {
   hoursByDay:{'월':{open:'09:00',close:'22:00'},'화':{open:'09:00',close:'22:00'},'수':{open:'09:00',close:'22:00'},'목':{open:'09:00',close:'22:00'},'금':{open:'09:00',close:'22:00'},'토':{open:'09:00',close:'22:00'},'일':{open:'09:00',close:'22:00'}},
   hoursNoteOpen:false,
   hoursNote:"",
+  // 쿠폰
+  coupons:[],
+  cpType:null, cpMode:null, cpAmount:"", cpMaxCap:false, cpMaxAmount:"", cpTarget:null,
 };
 let wzFormTab = 'basic';
 function wzSetFormTab(t){
