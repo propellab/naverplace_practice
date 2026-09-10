@@ -19,6 +19,8 @@
     --alert:#F04452;
     --alert-tint:#FDEBEC;
     --purple:#6C5CE7;
+    --teal:#12C9C0;
+    --blue:#3B82F6;
     --font: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "맑은 고딕", system-ui, sans-serif;
   }
   *{box-sizing:border-box;}
@@ -798,6 +800,37 @@
   .stp-age-bar-r{flex:1;height:7px;background:var(--surface);border-radius:4px;overflow:hidden;}
   .stp-age-bar-r .fill{height:100%;background:#FF5A87;border-radius:4px;}
   .stp-age-label{width:34px;text-align:center;color:var(--gray-500);font-size:11.5px;flex-shrink:0;}
+
+  /* --- 탭 우측 퀵 카운터(스마트콜) --- */
+  .stp-tabs{display:flex;align-items:center;justify-content:space-between;padding:0 24px;
+    border-bottom:1px solid var(--line);background:var(--white);}
+  .stp-tabs-left{display:flex;gap:30px;}
+  .stp-tabs-right{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink);font-weight:600;}
+  .stp-tabs-right b{color:var(--green-deep);font-weight:800;margin-left:3px;}
+  .stp-tabs-right .sep{color:var(--gray-300);}
+
+  /* --- 스마트콜 탭 --- */
+  .stp-section-title{font-size:19px;font-weight:800;color:var(--ink);margin:6px 0 16px;}
+  .stp-subtabs-row{display:flex;align-items:center;justify-content:space-between;
+    padding:22px 24px 16px;border-bottom:1px solid var(--line);}
+  .stp-subtabs{display:flex;gap:28px;}
+  .stp-subtab{font-size:16px;font-weight:600;color:var(--gray-300);cursor:pointer;padding-bottom:14px;
+    border-bottom:2px solid transparent;}
+  .stp-subtab.active{color:var(--ink);font-weight:800;border-color:var(--ink);}
+  .stp-callconn-dropdown{font-size:13px;font-weight:700;color:var(--green-deep);cursor:pointer;}
+  .stp-call-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:26px 24px 0;}
+  .stp-call-stat{padding:0 24px;}
+  .stp-call-stat:first-child{padding-left:0;}
+  .stp-call-stat .lbl{font-size:14px;color:var(--gray-700);font-weight:600;margin-bottom:10px;}
+  .stp-call-stat .val{font-size:26px;font-weight:800;}
+  .stp-call-stat .val.c-teal{color:var(--teal);}
+  .stp-call-stat .val.c-purple{color:var(--purple);}
+  .stp-call-stat .val.c-green{color:var(--green);}
+  .stp-chart-legend2{display:flex;gap:22px;padding:20px 24px 6px;font-size:12.5px;color:var(--gray-700);font-weight:600;}
+  .stp-chart-legend2 .sw{display:inline-block;width:26px;height:12px;border-radius:3px;margin-right:7px;vertical-align:middle;}
+  .stp-call-chart-wrap{padding:4px 20px 22px;}
+  .stp-empty-illust-call{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 10px 34px;}
+  .stp-empty-illust-call .txt{font-size:13.5px;color:var(--gray-500);margin-top:16px;font-weight:500;}
   @media (max-width:900px){
     .stp-place-grid{grid-template-columns:1fr;}
   }
@@ -1170,11 +1203,19 @@ function viewStatistics(){
     ${sidebarNav(NAV_ITEMS.indexOf('통계'))}
     <div class="biz-main">
       <div class="stp-tabs">
-        ${STAT_TABS.map(t=>`<div class="stp-tab ${statTab===t.id?'active':''}" onclick="wzSetStatTab('${t.id}')">${t.label}</div>`).join("")}
+        <div class="stp-tabs-left">
+          ${STAT_TABS.map(t=>`<div class="stp-tab ${statTab===t.id?'active':''}" onclick="wzSetStatTab('${t.id}')">${t.label}</div>`).join("")}
+        </div>
+        ${statTab==='smartcall' ? wzSmartcallQuickStats() : ''}
       </div>
-      ${statTab==='report' ? wzStatReportContent() : statTab==='place' ? wzStatPlaceContent() : wzStatPlaceholder(STAT_TABS.find(t=>t.id===statTab).label)}
+      ${statTab==='report' ? wzStatReportContent() : statTab==='place' ? wzStatPlaceContent() : statTab==='smartcall' ? wzStatSmartcallContent() : wzStatPlaceholder(STAT_TABS.find(t=>t.id===statTab).label)}
     </div>
   </div>`;
+}
+
+function wzSmartcallQuickStats(){
+  const items = [['오늘','0'],['성공','0'],['부재중','0'],['통화중','0'],['차단','0']];
+  return `<div class="stp-tabs-right">${items.map((it,i)=>`<span>${it[0]}<b>${it[1]}</b></span>${i<items.length-1?'<span class="sep">·</span>':''}`).join("")}</div>`;
 }
 
 function wzStatPlaceholder(label){
@@ -1436,6 +1477,107 @@ function wzStatPlaceContent(){
           ${wzGenderAgeWidget()}
         </div>
       </div>
+    </div>
+  </div>`;
+}
+
+/* --- 스마트콜 통계 --- */
+let callSubTab = 'summary';
+function wzSetCallSubTab(t){ callSubTab = t; render(); }
+
+function wzMultiLineChart(labels, series, maxY, steps){
+  const n = labels.length;
+  const W=940, H=380, padL=34, padR=10, padT=10, padB=30;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  function xy(i,v){ const x = padL + (n===1?0:(plotW/(n-1))*i); const y = padT+plotH-(v/maxY*plotH); return [x,y]; }
+  let grid='';
+  for(let s=0;s<=steps;s++){
+    const v = maxY/steps*s;
+    const y = padT+plotH-(v/maxY*plotH);
+    grid+=`<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W-padR}" y2="${y.toFixed(1)}" stroke="#E5E8EB" stroke-width="1"/><text x="2" y="${(y+4).toFixed(1)}" font-size="11" fill="#B0B8C1">${v.toFixed(1)}</text>`;
+  }
+  let xlabels='';
+  labels.forEach((lab,i)=>{ const p=xy(i,0); xlabels+=`<text x="${p[0].toFixed(1)}" y="${H-8}" font-size="12" fill="#6B7684" text-anchor="middle">${escapeHtml(lab)}</text>`; });
+  let paths='';
+  series.forEach(s=>{
+    const pts = s.data.map((v,i)=>xy(i,v));
+    const d = pts.map((p,i)=>(i===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+    paths += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.5"/>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:330px;display:block;">${grid}${paths}${xlabels}</svg>`;
+}
+
+function wzCallEmptyIllust(){
+  return `<div class="stp-empty-illust-call">
+    <svg width="96" height="96" viewBox="0 0 96 96">
+      <circle cx="42" cy="24" r="12" fill="#F3D9C4"/>
+      <path d="M22 84 C22 60 30 50 42 50 C54 50 62 60 62 84 Z" fill="#B9C4E0"/>
+      <rect x="50" y="58" width="12" height="20" rx="3" fill="#333D4B" transform="rotate(18 56 68)"/>
+      <circle cx="74" cy="34" r="14" fill="#03C75A"/>
+      <text x="74" y="40" font-size="16" font-weight="800" fill="#fff" text-anchor="middle">!</text>
+    </svg>
+    <div class="txt">조회 기간 내 데이터가 없습니다.</div>
+  </div>`;
+}
+
+function wzStatSmartcallContent(){
+  const dayLabels = ['03(목)','04(금)','05(토)','06(일)','07(월)','08(화)','09(수)'];
+  const series = [
+    {data:[0,0,0,0,0,1,0], color:'#12C9C0'},
+    {data:[0,0,0,0,0,0,1], color:'#6C5CE7'},
+    {data:[0,0,0,0,0,0,0], color:'#03C75A'},
+  ];
+  return `
+  <div class="stp-wrap">
+    <div class="stp-period-row">
+      <div class="stp-dropdown">모든 번호 <span style="font-size:10px;color:var(--gray-300);">▾</span></div>
+      <div class="stp-daterange"><span class="arrow">◀</span><span>25. 7. 03 (목) ~ 25. 7. 09 (수)</span><span class="arrow">▶</span></div>
+    </div>
+
+    <div class="stp-section-title">통화 통계</div>
+
+    <div class="stp-section">
+      <div class="stp-subtabs-row">
+        <div class="stp-subtabs">
+          <div class="stp-subtab ${callSubTab==='summary'?'active':''}" onclick="wzSetCallSubTab('summary')">통화 요약</div>
+          <div class="stp-subtab ${callSubTab==='daily'?'active':''}" onclick="wzSetCallSubTab('daily')">일별 통화</div>
+        </div>
+        <div class="stp-callconn-dropdown">통화 연결 <span>⌄</span></div>
+      </div>
+      <div class="stp-call-summary-grid">
+        <div class="stp-call-stat">
+          <div class="lbl">누적 통화 연결</div>
+          <div class="val c-teal">1</div>
+        </div>
+        <div class="stp-call-stat">
+          <div class="lbl">누적 통화 미연결</div>
+          <div class="val c-purple">1</div>
+        </div>
+      </div>
+      <div class="stp-call-summary-grid" style="grid-template-columns:1fr;">
+        <div class="stp-call-stat">
+          <div class="lbl">누적 ARS응대</div>
+          <div class="val c-green">0</div>
+        </div>
+      </div>
+      <div class="stp-chart-legend2">
+        <span><span class="sw" style="background:#12C9C0;"></span>통화 연결</span>
+        <span><span class="sw" style="background:#6C5CE7;"></span>통화 미연결</span>
+        <span><span class="sw" style="background:#03C75A;"></span>ARS응대</span>
+      </div>
+      <div class="stp-call-chart-wrap">
+        ${wzMultiLineChart(dayLabels, series, 1, 10)}
+      </div>
+    </div>
+
+    <div class="stp-panel" style="margin-top:16px;">
+      <div class="stp-panel-title" style="margin-bottom:6px;">전화가 많이 오는 매체</div>
+      ${wzCallEmptyIllust()}
+    </div>
+
+    <div class="stp-panel" style="margin-top:16px;">
+      <div class="stp-panel-title" style="margin-bottom:6px;">전화가 많이 오는 키워드</div>
+      ${wzCallEmptyIllust()}
     </div>
   </div>`;
 }
